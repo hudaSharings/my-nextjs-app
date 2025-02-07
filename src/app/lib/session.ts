@@ -12,6 +12,7 @@ export async function createSession(userId: string) {
   cookie.set("session", session, {
     httpOnly: true,
     secure: true,
+    path: "/",
     expires: expiresAt,
   });
 }

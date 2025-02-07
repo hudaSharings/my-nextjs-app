@@ -37,9 +37,10 @@ export async function login(prevState: any, formData: FormData) {
     };
   }
 
-  await createSession(testUser.id);
-
-  redirect("/dashboard");
+  createSession(testUser.id).then(
+    redirect("/dashboard")
+  );
+ 
 }
 
 export async function logout() {
