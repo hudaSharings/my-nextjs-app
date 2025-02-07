@@ -31,13 +31,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { NavAttendance } from "./navs/nav-attendace";
 import { NavTimesheet } from "./navs/nav-timesheet";
 import { NavMasters } from "./navs/nav-masters";
 import { NavSetups } from "./navs/nav-setups";
 import Link from "next/link";
-
 // This is sample data.
 const data = {
   user: {
@@ -61,52 +61,28 @@ const data = {
       logo: Command,
       plan: "Free",
     },
-  ],
-  navAttendance: [
+  ], 
+  navSetups: [
     {
-      title: "Attendance",
+      title: "Setup",
       url: "#",
-      icon: FileClock,
+      icon: Settings2,
       isActive: true,
       items: [
         {
-          title: "Punch In/Out",
-          url: "/punchinpunchout",
+          title: "locations",
+          url: "/location",
         },
         {
-          title: "My settings",
-          url: "/mysetting",
+          title: "Shifts",
+          url: "/shift",
         },
         {
-          title: "Reports",
-          url: "/reports",
-        },
-        {
-          title: "Adjustments",
-          url: "/adjustments",
+          title: "Work days",
+          url: "/workday",
         },
       ],
     },
-  ],
-  navTimesheet: [
-    {
-      title: "Timesheet",
-      url: "#",
-      icon: FileSpreadsheet,
-      isActive: true,
-      items: [
-        {
-          title: "My Timesheet",
-          url: "/myTimeSheet",
-        },
-        {
-          title: "All Timesheet",
-          url: "/allTimeSheet",
-        },
-      ],
-    },
-  ],
-  navMasters: [
     {
       title: "Master Data",
       url: "#",
@@ -139,25 +115,43 @@ const data = {
         },
       ],
     },
-  ],
-  navSetups: [
     {
-      title: "Setup",
+      title: "Timesheet",
       url: "#",
-      icon: Settings2,
+      icon: FileSpreadsheet,
       isActive: true,
       items: [
         {
-          title: "locations",
-          url: "/location",
+          title: "My Timesheet",
+          url: "/myTimeSheet",
         },
         {
-          title: "Shifts",
-          url: "/shift",
+          title: "All Timesheet",
+          url: "/allTimeSheet",
+        },
+      ],
+    },
+    {
+      title: "Attendance",
+      url: "#",
+      icon: FileClock,
+      isActive: true,
+      items: [
+        {
+          title: "Punch In/Out",
+          url: "/punchinpunchout",
         },
         {
-          title: "Work days",
-          url: "/workday",
+          title: "My settings",
+          url: "/mysetting",
+        },
+        {
+          title: "Reports",
+          url: "/reports",
+        },
+        {
+          title: "Adjustments",
+          url: "/adjustments",
         },
       ],
     },
@@ -270,26 +264,27 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props} >
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {/* <TeamSwitcher teams={data.teams} /> */}
+        <div className="flex w-full items-center justify-center ">
+        <img src="fts-logo.png" width="100px" height="50px"/>
+        </div>
+        
       </SidebarHeader>
-
-      <SidebarContent className="overflow-auto scrollbar-none" >        
-          <SidebarMenu className="ml-2">
-            <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Dashboard">
-                <LayoutDashboard />
-                <Link href="/dashboard">Dashboard</Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-
-          <NavSetups items={data.navSetups} />
-          <NavAttendance items={data.navAttendance} />
-          <NavTimesheet items={data.navTimesheet} />
-          <NavMasters items={data.navMasters} />
-          
+      <SidebarSeparator><hr/></SidebarSeparator>
+      <SidebarContent className="overflow-auto scrollbar-none">
+        <SidebarMenu className="ml-2 mt-2">
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Dashboard">
+              <LayoutDashboard />
+              <Link href="/dashboard">Dashboard</Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        <SidebarSeparator><hr/></SidebarSeparator>
+        <NavSetups items={data.navSetups} />
+     
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

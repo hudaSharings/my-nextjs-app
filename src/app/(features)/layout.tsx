@@ -54,7 +54,7 @@ export default function RootLayout({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb> */}
-              </div>
+              </div>              
             </header>
             {children}
           </SidebarInset>
