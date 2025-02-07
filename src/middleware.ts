@@ -24,27 +24,27 @@ async function authMiddleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// function composeMiddleware(...middlewares: Function[]) {
-//   return (req: NextRequest) => {
-//     for (const middleware of middlewares) {
-//       const response = middleware(req);
-//       if (response && response.status !== 200) return response;
-//     }
-//     return NextResponse.next();
-//   };
-// }
-
-// export const middleware = composeMiddleware(authMiddleware);
-export default async function middleware(req: NextRequest) {
-  const middlewares = [authMiddleware];
-  let response: NextResponse | undefined;
-
-  for (const middleware of middlewares) {
-    response = await middleware(req);
-    if (response) {
-      return response;
+function composeMiddleware(...middlewares: Function[]) {
+  return (req: NextRequest) => {
+    for (const middleware of middlewares) {
+      const response = middleware(req);
+      if (response && response.status !== 200) return response;
     }
-  }
-
-  return NextResponse.next();
+    return NextResponse.next();
+  };
 }
+
+export const middleware = composeMiddleware(authMiddleware);
+// export default async function middleware(req: NextRequest) {
+//   const middlewares = [authMiddleware];
+//   let response: NextResponse | undefined;
+
+//   for (const middleware of middlewares) {
+//     response = await middleware(req);
+//     if (response) {
+//       return response;
+//     }
+//   }
+
+//   return NextResponse.next();
+// }
