@@ -12,9 +12,9 @@ const signUpSchema = z.object({
 });
 
 export async function signup(data: { email:string,phone:string,username:string, password:string }) {
-   
+   debugger;
       try {
-        const { email,phone,username, password } = data;   
+       // const { email,phone,username, password } = data;   
         console.log("Signup Data:", data);
         return { success: true };
       } catch (error) {

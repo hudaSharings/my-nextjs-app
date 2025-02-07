@@ -17,8 +17,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
-export function NavSetups({
+export function NavAttendance({
   items,
 }: {
   items: {
@@ -34,7 +35,7 @@ export function NavSetups({
 }) {
   return (
     <SidebarGroup>
-      {/* <SidebarGroupLabel>Setup</SidebarGroupLabel> */}
+      {/* <SidebarGroupLabel>Attendace</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -56,9 +57,9 @@ export function NavSetups({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
+                        <Link href={subItem.url}>
                           <span>{subItem.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

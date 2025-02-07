@@ -11,27 +11,32 @@ import {
   FileSpreadsheet,
   Frame,
   GalleryVerticalEnd,
+  LayoutDashboard,
   Map,
   PieChart,
   Settings2,
   SquareTerminal,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/navs/nav-main";
+import { NavProjects } from "@/components/navs/nav-projects";
+import { NavUser } from "@/components/navs/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavAttendance } from "./nav-attendace";
-import { NavTimesheet } from "./nav-timesheet";
-import { NavMasters } from "./nav-masters";
-import { NavSetups } from "./nav-setups";
+import { NavAttendance } from "./navs/nav-attendace";
+import { NavTimesheet } from "./navs/nav-timesheet";
+import { NavMasters } from "./navs/nav-masters";
+import { NavSetups } from "./navs/nav-setups";
+import Link from "next/link";
 
 // This is sample data.
 const data = {
@@ -65,20 +70,20 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "PunchIn / PunchOut",
-          url: "#",
+          title: "Punch In/Out",
+          url: "/punchinpunchout",
         },
         {
           title: "My settings",
-          url: "#",
+          url: "/mysetting",
         },
         {
           title: "Reports",
-          url: "#",
+          url: "/reports",
         },
         {
-          title: "Adjustment Requests",
-          url: "#",
+          title: "Adjustments",
+          url: "/adjustments",
         },
       ],
     },
@@ -92,11 +97,11 @@ const data = {
       items: [
         {
           title: "My Timesheet",
-          url: "#",
+          url: "/myTimeSheet",
         },
         {
           title: "All Timesheet",
-          url: "#",
+          url: "/allTimeSheet",
         },
       ],
     },
@@ -110,27 +115,27 @@ const data = {
       items: [
         {
           title: "Employees",
-          url: "#",
+          url: "/employees",
         },
         {
           title: "User",
-          url: "#",
+          url: "/users",
         },
         {
           title: "Clients",
-          url: "#",
+          url: "/clients",
         },
         {
           title: "Projects",
-          url: "#",
+          url: "/projects",
         },
         {
           title: "Work Types",
-          url: "#",
+          url: "/worktypes",
         },
         {
           title: "Work Statuses",
-          url: "#",
+          url: "/workstatus",
         },
       ],
     },
@@ -144,15 +149,15 @@ const data = {
       items: [
         {
           title: "locations",
-          url: "#",
+          url: "/location",
         },
         {
           title: "Shifts",
-          url: "#",
+          url: "/shift",
         },
         {
           title: "Work days",
-          url: "#",
+          url: "/workday",
         },
       ],
     },
@@ -265,18 +270,26 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} >
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
-      <SidebarContent>
-      <NavSetups items={data.navSetups} />
-        <NavAttendance items={data.navAttendance} />
-        <NavTimesheet items={data.navTimesheet} />
-        <NavMasters items={data.navMasters} />
-      
-        {/*<NavMain items={data.navMain} />        
-         <NavProjects projects={data.projects} /> */}
+
+      <SidebarContent className="overflow-auto scrollbar-none" >        
+          <SidebarMenu className="ml-2">
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip="Dashboard">
+                <LayoutDashboard />
+                <Link href="/dashboard">Dashboard</Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+
+          <NavSetups items={data.navSetups} />
+          <NavAttendance items={data.navAttendance} />
+          <NavTimesheet items={data.navTimesheet} />
+          <NavMasters items={data.navMasters} />
+          
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
