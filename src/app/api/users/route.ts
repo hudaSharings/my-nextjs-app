@@ -60,6 +60,6 @@ export async function GET(request: Request) {
  const _users = await  neonSql`select * from users`
   return NextResponse.json({
     data: _users,
-    total: filteredUsers.length,
+    total: _users.length,
   })
 }
