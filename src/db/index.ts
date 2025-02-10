@@ -6,6 +6,6 @@ const connectionURL = process.env.DATABASE_URL
 if (connectionURL === undefined|| connectionURL === null|| connectionURL === "") {
     throw new Error("connectionURL is Not Found");
   }
-const executeSql = neon(connectionURL);
-const db = drizzle(executeSql);
-export default { sql,db,executeSql };
+const neonSql = neon(connectionURL);
+const db = drizzle(neonSql);
+export  { sql,db,neonSql };
