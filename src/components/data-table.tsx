@@ -30,23 +30,28 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React from "react"
-import { Columns3 } from "lucide-react"
+import { Columns3, Filter, FilterX, ListChecks, ListFilter, SlidersHorizontal } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  data: TData[],
+  addnew: () => void
+ // togglefilter: () => void,
+  filterComponent?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  addnew,
+  filterComponent
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] =React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-
+  const [showFilter, setShowFilter] = React.useState(false)
   const table = useReactTable({
     data,
     columns,
@@ -65,27 +70,17 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   })
-
   return (
     <div>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
+      <div className="flex items-center ">
+      <div className="flex w-full  items-center space-x-2 py-2" >
+      <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              <Columns3 className="text-muted-foreground"/>
-              Columns
-            </Button>
-            
+           <Button variant="outline" size={"sm"} >
+           <SlidersHorizontal />
+          </Button>            
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent >
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
@@ -104,7 +99,21 @@ export function DataTable<TData, TValue>({
                 );
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> 
+        {filterComponent&&      
+          <Button variant="outline" size={"sm"} onClick={()=>setShowFilter(!showFilter)}>
+          {/* <ListFilter /> */}
+          {showFilter?<FilterX />: <Filter />}       
+          </Button> 
+         } 
+          {showFilter&& 
+            filterComponent}
+         
+       </div>
+       <div className="ml-auto">
+       <Button  variant="outline" size={"sm"} onClick={addnew}>Add</Button>
+       </div>
+       
       </div>
       <div className="rounded-md border">
         <Table>

@@ -9,7 +9,7 @@ export const tableDefinition = {
   email:text('email'),
   mobileNumber:text('mobileNumber'),
   password:text('password'),
-  userType:text('userType'),
+  userType:text('userType').$default(()=>'user'),
   employeeId:integer('employeeId')
 };
 

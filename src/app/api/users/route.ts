@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import  {neonSql,db,sql}  from "../../../db/index"
+import  DbConnection  from "../../../db/index"
 const USERS = Array.from({ length: 100 }, (_, i) => ({
   id: i + 1,
   name: `User ${i + 1}`,
@@ -57,7 +57,8 @@ export async function GET(request: Request) {
   const start = (page - 1) * pageSize
   const end = start + pageSize
   const paginatedUsers = filteredUsers.slice(start, end)
- const _users = await  neonSql`select * from users`
+  const {execute}=DbConnection();
+ const _users = await  execute`select * from users`
   return NextResponse.json({
     data: _users,
     total: _users.length,

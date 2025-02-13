@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate --name init_db",
     "db:migrate": "tsx migrate.ts",
-    "db:studio":"npx drizzle-kit studio --port=3008"
+    "db:studio": "npx drizzle-kit studio --port=3008"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -23,6 +23,7 @@
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-switch": "^1.1.3",
