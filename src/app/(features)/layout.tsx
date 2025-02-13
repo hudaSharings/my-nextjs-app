@@ -10,6 +10,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "../providers";
+import { ModeToggle } from "@/components/mode-toggle";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -56,7 +57,10 @@ export default function RootLayout({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb> */}
-              </div>              
+              </div>  
+              <div className="ml-auto flex items-center gap-2 px-4">
+                 <ModeToggle /> 
+              </div>            
             </header>
             {children}
           </SidebarInset>

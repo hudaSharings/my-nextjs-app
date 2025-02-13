@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
+import { redirect } from 'next/navigation'
 import {
   MoreHorizontal,
   Pencil,
@@ -78,11 +79,12 @@ export default function UserTable({ data,onfilter,onSaveChanges,onDelete }: User
           setOpenDialog(true);
         }
       } else if (action === "view") {
-        if (useSheet) {
-          setOpenSheet(true);
-        } else {
-          setOpenDialog(true);
-        }
+        // if (useSheet) {
+        //   setOpenSheet(true);
+        // } else {
+        //   setOpenDialog(true);
+        // }
+        redirect(`/users/${id}`);
       } else if (action === "delete") {
         setOpenAlertDialog(true);
       }
