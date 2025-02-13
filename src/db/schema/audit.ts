@@ -5,7 +5,7 @@ export const auditSchema = {
   id:serial('id').primaryKey(),
   createdOn:timestamp('createdOn').default(sql`now()`),
   createdBy:text('createdBy'),
-  updatedOn:date('updatedOn').$onUpdate(()=>sql`now()`),
+  updatedOn:timestamp('updatedOn'),
   updatedBy:text('updatedby'),
   orgId:text('orgId')
 };

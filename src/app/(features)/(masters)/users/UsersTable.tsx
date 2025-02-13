@@ -54,14 +54,17 @@ import UserFilterForm from "./userFilter";
 
 type UserTableProps = {
   data: User[];
+  onfilter: (fv: { name: string; userName: string; email: string }) => void;
+  onSaveChanges?: () => void;
+  onDelete?: (id: number) => void;
 };
-export default function UserTable({ data }: UserTableProps) {
+export default function UserTable({ data,onfilter,onSaveChanges,onDelete }: UserTableProps) {
   const [openFilterSheet, setOpenFilterSheet] = useState(false);
   const [openSheet, setOpenSheet] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [useSheet, setUseSheet] = useState(true); // Toggle between Sheet and Dialog
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);  
   const { toast } = useToast();
 
   const handleAction = (id: number, action: string) => {
@@ -93,16 +96,10 @@ export default function UserTable({ data }: UserTableProps) {
       setOpenDialog(true);
     }
   };
-  const toggleFilterSheet = () => {
-    // Handle filter logic here
-    setOpenFilterSheet(!openFilterSheet);
-  }
   const handleDelete = () => {
-    // Handle delete logic here
-    setOpenAlertDialog(false);
-    toast({
-      title: "User deleted successfully!",
-    });
+    var userIdtoDelte=selectedUser?.id
+    onDelete && onDelete(userIdtoDelte!);
+    setOpenAlertDialog(false);  
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,16 +111,18 @@ export default function UserTable({ data }: UserTableProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {    
     // Handle form submission logic here
     setOpenSheet(false);
     setOpenDialog(false);
     toast({
       title: "User details saved successfully!",
     });
+    onSaveChanges && onSaveChanges();
   };
-
+const handleFilter=(fv:{name:string,userName:string,email:string})=>{   
+  onfilter(fv);
+}
   const actionsColumn = (
     handleAction: (id: number, action: string) => void
   ): ColumnDef<(typeof data)[0]>[] => [
@@ -205,8 +204,7 @@ export default function UserTable({ data }: UserTableProps) {
 
   return (
     <div className="container ">
-      <DataTable columns={columns} data={data} addnew={addnewUser}       
-      filterComponent={<UserFilterForm />} />
+      <DataTable columns={columns} data={data} addnew={addnewUser} filterComponent={<UserFilterForm getFilter={handleFilter} />} />
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
         <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 bg-white rounded-lg shadow-lg">
@@ -226,7 +224,7 @@ export default function UserTable({ data }: UserTableProps) {
             </SheetTitle>
             <SheetDescription>{selectedUser ? "Edit" : "Add"} the details of  user.</SheetDescription>
           </SheetHeader>       
-          <UserForm user={selectedUser} onSuccess={() => setOpenSheet(false)} />
+          <UserForm user={selectedUser} onSuccess={handleSubmit} />
         </SheetContent>
       </Sheet>
 
@@ -249,7 +247,7 @@ export default function UserTable({ data }: UserTableProps) {
 
             <DialogDescription>{selectedUser ? "Edit" : "Add"} the details of  user.</DialogDescription>
           </DialogHeader>         
-          <UserForm user={selectedUser} onSuccess={() => setOpenDialog(false)} />
+          <UserForm user={selectedUser} onSuccess={handleSubmit} />
         </DialogContent>
       </Dialog>
       
@@ -293,8 +291,7 @@ export default function UserTable({ data }: UserTableProps) {
               </div>
               <Button type="submit">Save</Button>
             </form>
-          )} */}
-         <UserFilterForm />
+          )} */}       
         </SheetContent>
       </Sheet>
 

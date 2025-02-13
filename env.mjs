@@ -28,6 +28,6 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     SESSION_SECRET: process.env.SESSION_SECRET,
-    BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    BASE_URL: process.env.BASE_URL,
   },
 });

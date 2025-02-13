@@ -76,6 +76,9 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
           employeeId: parseInt(values.employeeId),
         } as User;
         var result = await saveUser(_value);
+        if (result) {
+          onSuccess?.();
+        }
       } else if (values?.id && values?.id > 0) {
         const _value = {
           id: values.id,
@@ -88,8 +91,11 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
           employeeId: parseInt(values.employeeId),
         } as User;
         var result = await saveUser(_value);
+        if (result) {
+          onSuccess?.();
+        }
       }
-
+     
       toast({
         title: "saved successfully!",
         description: "User details saved successfully!",
@@ -103,8 +109,6 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
         description: "Failed to submit the form. Please try again.",
         variant: "destructive",
       });
-    }finally{
-      form.reset();
     }
   }
 

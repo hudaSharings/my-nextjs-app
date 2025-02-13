@@ -52,6 +52,7 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [showFilter, setShowFilter] = React.useState(false)
+  // const [isClearFIlter,setIsClearFilter]=React.useState(!showFilter);
   const table = useReactTable({
     data,
     columns,
@@ -101,8 +102,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu> 
         {filterComponent&&      
-          <Button variant="outline" size={"sm"} onClick={()=>setShowFilter(!showFilter)}>
-          {/* <ListFilter /> */}
+          <Button variant="outline" size={"sm"} onClick={()=>setShowFilter(!showFilter)}>        
           {showFilter?<FilterX />: <Filter />}       
           </Button> 
          } 

@@ -2,45 +2,40 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import user from "@/db/schema/users";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { boolean } from "drizzle-orm/mysql-core";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 
 
-
-export default function UserFilterForm() {
+type UserFilterProps={
+  getFilter:(data:{name:string,userName:string,email:string})=>void,  
+}
+export default function UserFilterForm({getFilter}:UserFilterProps) {
 
   const [name,setName]=useState("");
   const [userName,setUserName]=useState("");
   const [email,setEmail]=useState("");
   const [filter,setFilter]=useState<{name:string,userName:string,email:string}>({name:"",userName:"",email:""});
+  const prevfilter=useRef<{name:string,userName:string,email:string}>({name:"",userName:"",email:""});
   const handleSubmit=(event: FormEvent<HTMLFormElement>)=>  {
     console.log("submit");
   }
-
-  const handleNameChange=(e: React.ChangeEvent<HTMLInputElement>)=> {
-   setName(e.target.value);
-  }
-
-  const handleUserNameChange=(e: React.ChangeEvent<HTMLInputElement>)=> {
-    setUserName(e.target.value);
-  }
-
-  const handleEmailChange=(e: React.ChangeEvent<HTMLInputElement>)=> {
-    setEmail(e.target.value);
-  }
-
   useEffect(() => {
     setFilter({ name: name, userName: userName, email: email });
+    if (
+      (prevfilter.current.name != name && name == "") ||
+      (prevfilter.current.userName != userName && userName == "") ||
+      (prevfilter.current.email != email && email == "")
+    ) {
+      getFilter({ name: name, userName: userName, email: email });
+    }
+    prevfilter.current = { name: name, userName: userName, email: email };
   }, [name, userName, email]);
 
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      // Only filter when Enter is pressed
-      //filterData(inputValue);
-      console.log(filter);
+    if (e.key === 'Enter') {        
+      getFilter(filter)
     }
   };
- 
 return (
   <div className="flex flex-col">
 
@@ -51,7 +46,7 @@ return (
       <Input       
         name="name"
         value={name}
-        onChange={handleNameChange}
+        onChange={(e)=>setName(e.target.value)}
         onKeyDown={handleKeyPress}
         className="mt-1 sm:h-7"
       />
@@ -66,7 +61,7 @@ return (
       <Input       
         name="userName"
         value={userName}
-        onChange={handleUserNameChange}
+        onChange={(e)=>setUserName(e.target.value)}
         onKeyDown={handleKeyPress}
         className="mt-1 sm:h-7"
       />{
@@ -81,7 +76,7 @@ return (
         id="email"
         name="email"
         value={email}
-        onChange={handleEmailChange}
+        onChange={(e)=>setEmail(e.target.value)}
         onKeyDown={handleKeyPress}
         className="mt-1 sm:h-7"
       />{

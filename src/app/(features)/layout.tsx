@@ -9,6 +9,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster"
+import { Providers } from "../providers";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,7 +34,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      > <Providers>
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
@@ -60,6 +61,7 @@ export default function RootLayout({
             {children}
           </SidebarInset>
         </SidebarProvider>
+        </Providers>
       </body>
     </html>
   );
