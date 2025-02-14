@@ -1,20 +1,19 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { SessionPayload } from "./sessionPayload";
+import { SessionPayload, UserInfo } from "./sessionPayload";
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function createSession(userId: string) {
+export async function createSession(userId: string, userInfo: UserInfo) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const sessionPayload: SessionPayload = {
-    userId,
-    user: {      
-      name: "",
-      OrgIg: "",
-    },
+    userId,    
     expiresAt,
+    userInfo: { 
+    ...userInfo
+    },
   };
   const session = await encrypt(sessionPayload);
   const cookie = await cookies();
@@ -45,9 +44,15 @@ export async function decrypt(session: string | undefined = "") {
     const { payload } = await jwtVerify(session, encodedKey, {
       algorithms: ["HS256"],
     });
-    return payload;
+    return payload as SessionPayload;
   } catch (error) {
     console.log("Failed to verify session");
     return null;
   }
+}
+
+export async function getSession(): Promise<SessionPayload | null> {
+  const cookie = await cookies();
+  const session = cookie.get("session")?.value;
+  return decrypt(session);
 }

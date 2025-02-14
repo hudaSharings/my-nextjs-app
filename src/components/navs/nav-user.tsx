@@ -30,18 +30,20 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { logout } from "@/app/(auth)/login/action"
-
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+import { UserInfo } from "@/lib/auth/sessionPayload"
+import Link from "next/link"
+type navUserProps = {
+  user?: UserInfo
+}
+export function NavUser({ user }: navUserProps) {
   const { isMobile } = useSidebar()
-
+  const getInitials=(name:string)=> {
+    const nameParts = name.split(' ');
+    const initials = nameParts
+      .map((part) => part.charAt(0).toUpperCase()) // Get the first letter of each part of the name
+      .join(''); // Join the initials together
+    return initials;
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -52,12 +54,12 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback className="rounded-lg">{getInitials(user?.name??"")}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{user?.name}</span>
+                <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -91,7 +93,7 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+               <Link href="/account"> Account</Link>
               </DropdownMenuItem>
               {/* <DropdownMenuItem>
                 <CreditCard />

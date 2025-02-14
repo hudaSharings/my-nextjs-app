@@ -38,6 +38,12 @@ import { NavTimesheet } from "./navs/nav-timesheet";
 import { NavMasters } from "./navs/nav-masters";
 import { NavSetups } from "./navs/nav-setups";
 import Link from "next/link";
+
+import { SessionPayload, UserInfo } from "@/lib/auth/sessionPayload";
+import { useQuery } from "@tanstack/react-query";
+import { getSession } from "@/lib/auth/session";
+import { User } from "@/lib/types";
+
 // This is sample data.
 const data = {
   user: {
@@ -262,7 +268,20 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({userInfo, ...props }: React.ComponentProps<typeof Sidebar>&{userInfo?:UserInfo}) {
+
+  sessionStorage.setItem('user', JSON.stringify({
+    name: userInfo?.name, 
+    userName: userInfo?.userName,
+    email: userInfo?.email,
+  }));
+
+// const {data:userSession} = useQuery({
+//   queryKey: ["userSession"],
+//   queryFn: () => 
+//      getSession()
+// });
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -287,7 +306,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
      
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userInfo} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

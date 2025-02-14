@@ -48,18 +48,19 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "@/lib/types";
+import { User, UserFilter } from "@/lib/types";
 import UserForm from "./userForm";
 import { Column } from "drizzle-orm";
 import UserFilterForm from "./userFilter";
 
 type UserTableProps = {
   data: User[];
-  onfilter: (fv: { name: string; userName: string; email: string }) => void;
+  totalCount?: number;
+  onfilter: (fv: UserFilter) => void;
   onSaveChanges?: () => void;
   onDelete?: (id: number) => void;
 };
-export default function UserTable({ data,onfilter,onSaveChanges,onDelete }: UserTableProps) {
+export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDelete }: UserTableProps) {
   const [openFilterSheet, setOpenFilterSheet] = useState(false);
   const [openSheet, setOpenSheet] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -122,7 +123,7 @@ export default function UserTable({ data,onfilter,onSaveChanges,onDelete }: User
     });
     onSaveChanges && onSaveChanges();
   };
-const handleFilter=(fv:{name:string,userName:string,email:string})=>{   
+const handleFilter=(fv:UserFilter)=>{   
   onfilter(fv);
 }
   const actionsColumn = (
@@ -206,7 +207,7 @@ const handleFilter=(fv:{name:string,userName:string,email:string})=>{
 
   return (
     <div className="container ">
-      <DataTable columns={columns} data={data} addnew={addnewUser} filterComponent={<UserFilterForm getFilter={handleFilter} />} />
+      <DataTable columns={columns} data={data} totalCount={totalCount} addnew={addnewUser} filterComponent={<UserFilterForm getFilter={handleFilter} />} />
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
         <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 bg-white rounded-lg shadow-lg">

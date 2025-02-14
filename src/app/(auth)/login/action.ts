@@ -3,41 +3,49 @@
 import { z } from "zod";
 import { createSession, deleteSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
+import { loginValidation } from "@/services/authService";
+import { UserInfo } from "@/lib/auth/sessionPayload";
 
-const testUser = {
-  id: "1",
-  email: "hudapossible@gmail.com",
-  password: "12345678",
-};
+// const testUser = {
+//   id: "1",
+//   email: "hudapossible@gmail.com",
+//   password: "12345678",
+// };
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }).trim(),
+  email: z.string().min(3, { message: "userName/Email is required" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" })
+    .min(6, { message: "Password must be at least 8 characters" })
     .trim(),
 });
 
 export async function login(prevState: any, formData: FormData) {
-  const result = loginSchema.safeParse(Object.fromEntries(formData));
+  const validationResult = loginSchema.safeParse(Object.fromEntries(formData));
 
-  if (!result.success) {
+  if (!validationResult.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors: validationResult.error.flatten().fieldErrors,
     };
   }
 
-  const { email, password } = result.data;
-
-  if (email !== testUser.email || password !== testUser.password) {
+  const { email, password } = validationResult.data;
+ const loginUser=await loginValidation(email,password);
+  if (!loginUser) {
     return {
       errors: {
-        email: ["Invalid email or password"],
+        email: ["Invalid Credentials"],
       },
     };
   }
-
-  createSession(testUser.id).then(
+const userInfo: UserInfo = {
+  userName: loginUser?.userName,
+  name: loginUser?.name,
+  email: loginUser?.email,
+  OrgIg: "",
+  avatar: "",
+};
+  createSession(loginUser?.userName, userInfo).then(
     redirect("/dashboard")
   );
  

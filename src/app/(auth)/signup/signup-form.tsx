@@ -24,6 +24,7 @@ import FormFieldComponent from "@/components/formFileds";
 import Link from "next/link";
 
 const formSchema = z.object({
+  name: z.string().min(1, "Full Name is required"),
   email: z.string().email("Invalid email address"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -36,6 +37,7 @@ export default function SignUpForm({ className, ...props }: React.ComponentProps
   const form = useForm<sigUpFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "", 
       username: "",
       password: "",
@@ -74,6 +76,7 @@ export default function SignUpForm({ className, ...props }: React.ComponentProps
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto py-6">
+            <FormFieldComponent<sigUpFormData> control={form.control} name="name" label="Full Name" placeholder="Choose a username" />
               <FormFieldComponent<sigUpFormData> control={form.control} name="email" label="Email" placeholder="Enter your email" type="email" />
               <FormFieldComponent<sigUpFormData> control={form.control} name="username" label="Username" placeholder="Choose a username" />
               <FormField

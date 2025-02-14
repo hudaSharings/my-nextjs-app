@@ -1,25 +1,12 @@
 "use server";
-import { User } from "@/lib/types";
+import { User, UserFilter, UserSearchParams } from "@/lib/types";
 import DbConnection from "@/db";
 import { tables } from "@/db/tables"
-import { and, eq, ilike, like, SQL } from "drizzle-orm";
+import { and, or,asc, desc, eq, ilike, like, SQL } from "drizzle-orm";
 import { env } from "../../env.mjs";
 
-export async function getUsers(filters?: { name?: string; userName?: string; email?: string }): Promise<User[]> {
-  /* const {db,sql,execute} =await DbConnection(env.DATABASE_URL); 
-  let userQuery = `SELECT * FROM users`;
-  if (filters) {
-     const conditions = Object.entries(filters).map(([key, value]) => {
-        if(value!=undefined && value!=null&& value!="") 
-          return `${key} LIKE '%${value}%'`;
-      });      
-      const conditionsToFilter = conditions.filter((x) => x!==undefined);    
-      if (conditionsToFilter.length > 0)
-      userQuery += ` WHERE ${conditionsToFilter?.join(" AND ")}`;
-  }
-console.log(userQuery);
- const users = (await (db.execute(sql.raw(userQuery)))).rows as unknown as User[];
- //const users = await execute`SELECT * FROM users` as User[];*/
+export async function getUsers(searchParams?: UserSearchParams): Promise<{data:User[],totalCount:number}> {
+ const filters=searchParams as UserFilter; 
  const filtersArray:SQL[] = [];  
  if (filters) {
   if (filters.name) {
@@ -31,17 +18,29 @@ console.log(userQuery);
   if (filters.email) {
     filtersArray.push(ilike(tables.users.email,'%' + filters.email+ '%'));
   }
+  if (filters.userType && filters.userType!="0"&& filters.userType!="All") {
+    filtersArray.push(eq(tables.users.userType,filters.userType));
+  }
  }
- const users=await searchUsers(filtersArray);
- return users;
-}
-const searchUsers=async (filters:SQL[]):Promise<User[]>=>{
-  const {db} =await DbConnection(env.DATABASE_URL); 
-  const result =await db.select().from(tables.users).where(and(...filters))
-  .offset(0).limit(10).orderBy(tables.users.id);
-  return result as User[];
+ const limit = searchParams?.pageSize??10
+ const offset = ((searchParams?.page??1) - 1) * limit
 
+// const sortBy = searchParams?.sortBy??'id' as keyof typeof tables.users
+// const sortByColumn = tables.users[sortBy].column;
+// const sort = searchParams?.sortOrder=="asc"?asc(sortByColumn) : desc(sortByColumn)
+ 
+ const {db,sql} =await DbConnection(env.DATABASE_URL); 
+ const users =await db.select()
+                .from(tables.users)
+                .where(and(...filtersArray))
+                .offset(offset)
+                .limit(limit)
+                .orderBy(tables.users.id) ;
+
+ const userCount =(await db.execute(sql.raw("SELECT COUNT(1) FROM users"))).rows[0].count as number;
+ return {data:users as User[],totalCount:userCount??0};
 }
+
 export async function getUsersById(id:number): Promise<User> {
     const {execute} =await DbConnection(env.DATABASE_URL);
     
@@ -51,7 +50,19 @@ export async function getUsersById(id:number): Promise<User> {
     }
     return users[0];
 }
-
+export async function getUsersByUserName(username:string): Promise<User> {
+  const {db} =await DbConnection(env.DATABASE_URL);
+  const user =  await db
+      .select()
+      .from(tables.users)
+      .where(or(
+            eq(tables.users.userName, username),
+            eq(tables.users.email, username)
+          )
+      ) as User[];
+    //const user = await execute`SELECT * FROM users WHERE (userName = ${username} OR email = ${username}) AND password = ${password}` as User[];
+    return user[0] ;
+}
 export async function createUser(user: Partial<User>): Promise<any> {
   debugger;
     const {db} = await DbConnection(env.DATABASE_URL);      

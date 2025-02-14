@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "../providers";
 import { ModeToggle } from "@/components/mode-toggle";
+import { SidebarSC } from "@/components/sidebar-sc";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,8 +37,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       > <Providers>
-        <SidebarProvider>
-          <AppSidebar />
+        <SidebarProvider>          
+          <SidebarSC/> {/* <AppSidebar /> moved into SidebarSC to support session management in server components */}
           <SidebarInset>
           <Toaster  />
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">

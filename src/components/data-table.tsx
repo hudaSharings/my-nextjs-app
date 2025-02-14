@@ -35,14 +35,15 @@ import { Columns3, Filter, FilterX, ListChecks, ListFilter, SlidersHorizontal } 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[],
+  totalCount?: number
   addnew: () => void
- // togglefilter: () => void,
   filterComponent?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  totalCount,
   addnew,
   filterComponent
 }: DataTableProps<TData, TValue>) {
@@ -66,7 +67,7 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
+     // columnFilters,
       columnVisibility,
       rowSelection,
     },
@@ -169,7 +170,7 @@ export function DataTable<TData, TValue>({
     
       <div className="flex items-center justify-end space-x-2 py-4">
       <div className=" text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
+        {totalCount} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
         <Button
