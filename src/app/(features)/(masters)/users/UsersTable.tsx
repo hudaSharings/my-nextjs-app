@@ -7,8 +7,6 @@ import {
   Pencil,
   SquareArrowOutUpRight,
   Trash2,
-  StretchHorizontal,
-  ArrowUpRight,
   PanelRight,
   SquareArrowUpRight,
   ArrowUpDown,
@@ -45,12 +43,9 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { User, UserFilter } from "@/lib/types";
 import UserForm from "./userForm";
-import { Column } from "drizzle-orm";
 import UserFilterForm from "./userFilter";
 
 type UserTableProps = {
@@ -59,8 +54,9 @@ type UserTableProps = {
   onfilter: (fv: UserFilter) => void;
   onSaveChanges?: () => void;
   onDelete?: (id: number) => void;
+  loading?: boolean;
 };
-export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDelete }: UserTableProps) {
+export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDelete,loading }: UserTableProps) {
   const [openFilterSheet, setOpenFilterSheet] = useState(false);
   const [openSheet, setOpenSheet] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -175,6 +171,10 @@ const handleFilter=(fv:UserFilter)=>{
       header: "ID",
     },
     {
+      accessorKey: "employeeId",
+      header: "Employee Id",
+    },
+    {
       accessorKey: "name",
       header: ({ column }) => {
         return <SortingButton column={column} title="Name" />;
@@ -207,7 +207,7 @@ const handleFilter=(fv:UserFilter)=>{
 
   return (
     <div className="container ">
-      <DataTable columns={columns} data={data} totalCount={totalCount} addnew={addnewUser} filterComponent={<UserFilterForm getFilter={handleFilter} />} />
+      <DataTable columns={columns} data={data} totalCount={totalCount} addnew={addnewUser} isLoading={loading}  filterComponent={<UserFilterForm getFilter={handleFilter} />} />
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
         <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 bg-white rounded-lg shadow-lg">

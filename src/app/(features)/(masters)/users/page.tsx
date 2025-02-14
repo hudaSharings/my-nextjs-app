@@ -17,7 +17,7 @@ export default function Page() {
         refetch();
     },[pageing,sort,filter])
 
-    const { data: userdata, refetch } = useQuery({
+    const { data: userdata,isLoading ,refetch } = useQuery({
       queryKey: ["users", filter],
       queryFn: () =>
         getUsers({
@@ -45,7 +45,7 @@ export default function Page() {
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                 <h1>Users</h1>
-                <UsersTable data={userdata?.data || []} totalCount={userdata?.totalCount} onfilter={(fv)=>handleFilter(fv)}  onSaveChanges={()=>refetch() } onDelete={(id)=>handleDelete(id) } />
+                <UsersTable loading={isLoading} data={userdata?.data || []} totalCount={userdata?.totalCount} onfilter={(fv)=>handleFilter(fv)}  onSaveChanges={()=>refetch() } onDelete={(id)=>handleDelete(id) } />
         </div>
         
     );

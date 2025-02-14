@@ -31,12 +31,14 @@ import {
 } from "@/components/ui/table"
 import React from "react"
 import { Columns3, Filter, FilterX, ListChecks, ListFilter, SlidersHorizontal } from "lucide-react"
+import { Skeleton } from "./ui/skeleton"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[],
   totalCount?: number
   addnew: () => void
+  isLoading?: boolean
   filterComponent?: React.ReactNode
 }
 
@@ -45,6 +47,7 @@ export function DataTable<TData, TValue>({
   data,
   totalCount,
   addnew,
+  isLoading,
   filterComponent
 }: DataTableProps<TData, TValue>) {
 
@@ -136,6 +139,20 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
+          {(isLoading==true)&&
+          <TableBody>
+          {[...Array(4)].map((_, index) => (
+            <TableRow key={index}>
+              {columns.map((column) => (
+                <TableCell key={column.id}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+          }
+          {isLoading==false&&
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -163,8 +180,9 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
-          </TableBody>
+          </TableBody>}
         </Table>
+        
       </div>
 
     

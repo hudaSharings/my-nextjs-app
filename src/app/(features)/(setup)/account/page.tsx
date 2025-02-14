@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/lib/auth/sessionPayload";
 import { User } from "@/lib/types";
 import { getUsersByUserName } from "@/services/userService";
@@ -8,7 +9,7 @@ import { PenIcon } from "lucide-react";
 
 export default function Page() {
 
-    const {data:user}=useQuery({
+    const {data:user,isLoading}=useQuery({
         queryKey:["account"],
         queryFn:()=>{
             const userStr = sessionStorage.getItem("user");
@@ -20,13 +21,19 @@ export default function Page() {
             return {}as User
         }
     })
-    // return (
-    //     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-    //             <h1>{myinfo?.name}</h1>
-    //     </div>
-        
-    // );
-
+        if(isLoading)
+            return (
+                <div className="min-h-screen bg-gray-50 p-6">
+                  <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+                </div>
+              )
+ 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
           {/* Profile Header */}
