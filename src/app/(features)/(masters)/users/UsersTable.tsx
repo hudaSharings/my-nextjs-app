@@ -170,10 +170,10 @@ const handleFilter=(fv:UserFilter)=>{
       accessorKey: "id",
       header: "ID",
     },
-    {
-      accessorKey: "employeeId",
-      header: "Employee Id",
-    },
+    // {
+    //   accessorKey: "employeeId",
+    //   header: "Employee Id",
+    // },
     {
       accessorKey: "name",
       header: ({ column }) => {
