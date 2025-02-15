@@ -63,6 +63,17 @@ export async function getUsersByUserName(username:string): Promise<User> {
     //const user = await execute`SELECT * FROM users WHERE (userName = ${username} OR email = ${username}) AND password = ${password}` as User[];
     return user[0] ;
 }
+export async function usersExists(userName:string,email:string): Promise<User[]> {
+  const {db} =await DbConnection(env.DATABASE_URL);
+  const user =  await db
+      .select()
+      .from(tables.users)       
+      .where(or(
+        eq(tables.users.userName, userName),
+        eq(tables.users.email, email)
+      )) as User[];
+  return user;
+}
 export async function createUser(user: Partial<User>): Promise<any> {
   debugger;
     const {db} = await DbConnection(env.DATABASE_URL);      

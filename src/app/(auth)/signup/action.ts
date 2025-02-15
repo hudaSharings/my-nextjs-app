@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { AnyARecord } from "node:dns";
-import { createUser } from "@/services/userService";
+import { createUser, usersExists } from "@/services/userService";
 import { User } from "@/lib/types";
 
 
@@ -18,6 +18,9 @@ export async function signup(data: {name:string, email:string,phone:string,usern
       try {
        // const { email,phone,username, password } = data;   
         console.log("Signup Data:", data);
+       const user = await usersExists(data.username,data.email)
+        if(user.length>0) 
+          return { errors: { email: "User already exists" } };
         await createUser({name:data.name, email:data.email,phone:data.phone,userName:data.username,password:data.password} as Partial<User>);
         return { success: true };
       } catch (error) {

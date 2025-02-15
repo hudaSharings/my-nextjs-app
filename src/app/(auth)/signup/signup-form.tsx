@@ -67,7 +67,7 @@ export default function SignUpForm({ className, ...props }: React.ComponentProps
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-       <Toaster richColors position="top-right" />
+     
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Sign Up</CardTitle>
