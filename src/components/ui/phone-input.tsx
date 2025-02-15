@@ -85,7 +85,7 @@ const CountrySelect = ({
   onChange,
 }: CountrySelectProps) => {
   return (
-    <Popover>
+    <Popover modal={true}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -105,9 +105,9 @@ const CountrySelect = ({
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent className="w-[300px] p-0 " style={{ pointerEvents: "auto" }}>
         <Command>
-          <CommandInput placeholder="Search country..." />
+          <CommandInput placeholder="Search country..." style={{ pointerEvents: "auto" }} />
           <CommandList>
             <ScrollArea className="h-72">
               <CommandEmpty>No country found.</CommandEmpty>
