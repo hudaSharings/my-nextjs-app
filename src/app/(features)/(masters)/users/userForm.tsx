@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,7 @@ import {
 import { User } from "@/lib/types";
 import { saveUser } from "./actions";
 import { useToast } from "@/hooks/use-toast";
+import { FormFieldCombobox } from "@/components/formFieldCombobox";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -38,6 +39,7 @@ const formSchema = z.object({
   password: z.string().min(8),
   userType: z.string(),
   employeeId: z.string(),
+  language: z.string(),
 });
 type UserFormProps = {
   onSuccess?: () => void;
@@ -56,10 +58,21 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
       mobileNumber: user?.mobileNumber || "",
       password: user?.password || "",
       userType: user?.userType || "",
-      employeeId: user?.employeeId.toString() || "",
+      employeeId: user?.employeeId?.toString() || "0",
+      language: "en",
     },
   });
-
+  const languages = [   
+    { label: "English", value: "en" },
+    { label: "French", value: "fr" },
+    { label: "German", value: "de" },
+    { label: "Spanish", value: "es" },
+    { label: "Portuguese", value: "pt" },
+    { label: "Russian", value: "ru" },
+    { label: "Japanese", value: "ja" },
+    { label: "Korean", value: "ko" },
+    { label: "Chinese", value: "zh" },
+  ];
   async function onSubmit(values: z.infer<typeof formSchema>) {
     debugger;
     try {
@@ -113,6 +126,7 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
   }
 
   return (
+    <FormProvider {...form}>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -259,7 +273,7 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
                     <SelectValue placeholder="" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent>                  
                   <SelectItem value="1002">m@example.com</SelectItem>
                   <SelectItem value="1003">m@google.com</SelectItem>
                   <SelectItem value="1004">m@support.com</SelectItem>
@@ -269,6 +283,24 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
               <FormMessage />
             </FormItem>
           )}
+        />
+         <FormField
+          control={form.control}
+          name="language"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Language</FormLabel>
+              <FormControl>
+            <FormFieldCombobox  
+            name="language"           
+            options={languages}
+            placeholder="Select language"
+            // description="Choose your preferred language."
+          />
+          </FormControl>
+            <FormMessage />
+           </FormItem>
+          )}      
         />
         <div className="absolute bottom-4 right-4 px-6 py-2 text-white rounded gap-2">
           {isnew && (
@@ -286,5 +318,6 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
         </div>
       </form>
     </Form>
+    </FormProvider>
   );
 }
