@@ -1,5 +1,5 @@
 "use client";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { redirect } from 'next/navigation'
 import {
@@ -42,31 +42,58 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { User, UserFilter } from "@/lib/types";
 import UserForm from "./userForm";
 import UserFilterForm from "./userFilter";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { deleteUser, getUsers } from "@/services/userService";
 
-type UserTableProps = {
-  data: User[];
-  totalCount?: number;
-  onfilter: (fv: UserFilter) => void;
-  onSaveChanges?: () => void;
-  onDelete?: (id: number) => void;
-  loading?: boolean;
+type UserTableProps = {    
 };
-export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDelete,loading }: UserTableProps) {
+export default function UserTable() {
   const [openFilterSheet, setOpenFilterSheet] = useState(false);
   const [openSheet, setOpenSheet] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
   const [useSheet, setUseSheet] = useState(true); // Toggle between Sheet and Dialog
   const [selectedUser, setSelectedUser] = useState<User | null>(null);  
+ 
+ const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
+ const [sort,setSort]=useState<{column:string,order:"asc"|"desc"}>();
+ const [filter,SetFilter]=useState<UserFilter>();
+ 
   const { toast } = useToast();
+//   useEffect(() => {       
+//     refetch();
+//     console.log(data);
+// }, [pagination,filter,sort]);
+
+  const { data,isLoading ,refetch,isFetching,error } = useQuery<{ data: User[]; totalCount: number }>({
+    queryKey: ["users", filter,pagination,sort],
+    queryFn:async () =>{
+      const response = await getUsers({
+        pageIndex: pagination.pageIndex, 
+        pageSize: pagination.pageSize,
+        sortBy: sort?.column,
+        sortOrder: sort?.order,
+        ...filter,
+      });
+      console.log("Data from server:", response);
+      return response;
+    },  
+    placeholderData: keepPreviousData,
+    // Disable refetching when the user navigates the page or any dependency change unless required
+   // staleTime: 1000 * 60 * 5, 
+  });
+  if (error) {
+    console.error("Error fetching users:", error);
+  }
+
 
   const handleAction = (id: number, action: string) => {
-    const user = data?.find((user) => user.id === id);
+    const user = data?.data.find((user) => user.id === id);
     if (user) {
       setSelectedUser(user);
       if (action === "edit") {
@@ -95,9 +122,13 @@ export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDel
       setOpenDialog(true);
     }
   };
-  const handleDelete = () => {
-    var userIdtoDelte=selectedUser?.id
-    onDelete && onDelete(userIdtoDelte!);
+  const handleDelete = async () => {
+    var userIdtoDelte=selectedUser?.id   
+     await deleteUser(userIdtoDelte!);
+            refetch();
+            toast({
+                title: "User deleted successfully!",
+              });
     setOpenAlertDialog(false);  
   };
 
@@ -117,14 +148,21 @@ export default function UserTable({ data,totalCount,onfilter,onSaveChanges,onDel
     toast({
       title: "User details saved successfully!",
     });
-    onSaveChanges && onSaveChanges();
+    refetch();
   };
-const handleFilter=(fv:UserFilter)=>{   
-  onfilter(fv);
-}
-  const actionsColumn = (
+
+const handleFilter=useCallback((fv:UserFilter)=>{               
+  SetFilter(fv);   
+  console.log(fv);            
+},[])
+
+const handlePaginationChange=useCallback((pagination: { pageIndex: number; pageSize: number })=>{
+        setPagination(pagination);
+        console.log("Pagination changed:", pagination);           
+ },[])
+const actionsColumn = (
     handleAction: (id: number, action: string) => void
-  ): ColumnDef<(typeof data)[0]>[] => [
+  ): ColumnDef<User>[] => [
     {
       id: "actions",
       cell: ({ row }) => {
@@ -207,14 +245,23 @@ const handleFilter=(fv:UserFilter)=>{
 
   return (
     <div className="container ">
-      <DataTable columns={columns} data={data} totalCount={totalCount} addnew={addnewUser} isLoading={loading}  filterComponent={<UserFilterForm getFilter={handleFilter} />} />
+      <DataTable
+        columns={columns}
+        data={data?.data||[]}
+        totalCount={data?.totalCount}
+        paginationState={pagination}
+        onPaginationChange={handlePaginationChange}
+        addnew={addnewUser}
+        isLoading={isLoading}
+        filterComponent={<UserFilterForm getFilter={handleFilter} />}
+      />
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
         <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 bg-white rounded-lg shadow-lg">
           <SheetHeader>
             <SheetTitle>
               <div className="flex items-center">
-              {selectedUser ? "Edit" : "Add"} User
+                {selectedUser ? "Edit" : "Add"} User
                 <SquareArrowUpRight
                   className="ml-2 h-4 w-4 cursor-pointer"
                   onClick={() => {
@@ -225,8 +272,10 @@ const handleFilter=(fv:UserFilter)=>{
                 ></SquareArrowUpRight>
               </div>
             </SheetTitle>
-            <SheetDescription>{selectedUser ? "Edit" : "Add"} the details of  user.</SheetDescription>
-          </SheetHeader>       
+            <SheetDescription>
+              {selectedUser ? "Edit" : "Add"} the details of user.
+            </SheetDescription>
+          </SheetHeader>
           <UserForm user={selectedUser} onSuccess={handleSubmit} />
         </SheetContent>
       </Sheet>
@@ -248,12 +297,14 @@ const handleFilter=(fv:UserFilter)=>{
               </div>
             </DialogTitle>
 
-            <DialogDescription>{selectedUser ? "Edit" : "Add"} the details of  user.</DialogDescription>
-          </DialogHeader>         
+            <DialogDescription>
+              {selectedUser ? "Edit" : "Add"} the details of user.
+            </DialogDescription>
+          </DialogHeader>
           <UserForm user={selectedUser} onSuccess={handleSubmit} />
         </DialogContent>
       </Dialog>
-      
+
       <Sheet open={openFilterSheet} onOpenChange={setOpenFilterSheet}>
         <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl  p-8 bg-white rounded-lg shadow-lg">
           <SheetHeader>
@@ -294,7 +345,7 @@ const handleFilter=(fv:UserFilter)=>{
               </div>
               <Button type="submit">Save</Button>
             </form>
-          )} */}       
+          )} */}
         </SheetContent>
       </Sheet>
 

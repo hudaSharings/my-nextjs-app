@@ -1,5 +1,5 @@
 export interface ISearchParams {
-  page?: number;
+  pageIndex?: number;
   pageSize?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";

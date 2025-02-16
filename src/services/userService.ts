@@ -6,6 +6,7 @@ import { and, or,asc, desc, eq, ilike, like, SQL } from "drizzle-orm";
 import { env } from "../../env.mjs";
 
 export async function getUsers(searchParams?: UserSearchParams): Promise<{data:User[],totalCount:number}> {
+  console.log(searchParams);
  const filters=searchParams as UserFilter; 
  const filtersArray:SQL[] = [];  
  if (filters) {
@@ -23,7 +24,7 @@ export async function getUsers(searchParams?: UserSearchParams): Promise<{data:U
   }
  }
  const limit = searchParams?.pageSize??10
- const offset = ((searchParams?.page??1) - 1) * limit
+ const offset = ((searchParams?.pageIndex??0)) * limit
 
 // const sortBy = searchParams?.sortBy??'id' as keyof typeof tables.users
 // const sortByColumn = tables.users[sortBy].column;
@@ -38,6 +39,7 @@ export async function getUsers(searchParams?: UserSearchParams): Promise<{data:U
                 .orderBy(tables.users.id) ;
 
  const userCount =(await db.execute(sql.raw("SELECT COUNT(1) FROM users"))).rows[0].count as number;
+ console.log(users.length,userCount);
  return {data:users as User[],totalCount:userCount??0};
 }
 
