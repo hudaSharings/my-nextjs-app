@@ -24,7 +24,7 @@ export async function getUsers(searchParams?: UserSearchParams): Promise<{data:U
   }
  }
  const limit = searchParams?.pageSize??10
- const offset = ((searchParams?.pageIndex??0)) * limit
+ const offset = (((filtersArray.length>0)?0:searchParams?.pageIndex??0)) * limit
 
 // const sortBy = searchParams?.sortBy??'id' as keyof typeof tables.users
 // const sortByColumn = tables.users[sortBy].column;

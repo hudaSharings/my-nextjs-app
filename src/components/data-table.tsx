@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React, { useCallback, useEffect } from "react"
-import { Columns3, Filter, FilterX, ListChecks, ListFilter, SlidersHorizontal } from "lucide-react"
+import { Columns3, Filter, FilterX, ListChecks, ListFilter, RefreshCcw, SlidersHorizontal, SquarePlus } from "lucide-react"
 import { Skeleton } from "./ui/skeleton"
 import user from "@/db/schema/users"
 import { Label } from "./ui/label"
@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   paginationState?: PaginationState,
   onPaginationChange: (pagination: PaginationState) => void,
   addnew: () => void
+  referesh: () => void
   isLoading?: boolean
   filterComponent?: React.ReactNode
 }
@@ -55,6 +56,7 @@ export function DataTable<TData, TValue>({
   paginationState,
   onPaginationChange,
   addnew,
+  referesh,
   isLoading,
   filterComponent
 }: DataTableProps<TData, TValue>) {
@@ -65,8 +67,7 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({})
   const [showFilter, setShowFilter] = React.useState(false)
   const [pagination, setPagination] = React.useState<PaginationState>(paginationState ?? { pageIndex: 0, pageSize: 10 });
-  const [visiblePrevious, setVisiblePrevious] = React.useState(false)
-  const [visibleNext, setVisibleNext] = React.useState(false)
+
   const table = useReactTable({
     data:data,
     columns,
@@ -91,7 +92,10 @@ export function DataTable<TData, TValue>({
 useEffect(() => {
   onPaginationChange(table.getState().pagination);
 }, [table.getState().pagination]);  
-
+const handleRefresh = () => { 
+  table.resetPagination();
+  referesh();
+}
 return (
     <div>
       <div className="flex items-center ">
@@ -134,8 +138,13 @@ return (
           {showFilter && filterComponent}
         </div>
         <div className="ml-auto">
+        <Button variant="outline" size={"sm"} className="mr-2" onClick={handleRefresh}>
+        <RefreshCcw />
+        </Button>
+        </div>
+        <div className="ml-auto">
           <Button variant="outline" size={"sm"} onClick={addnew}>
-            Add
+          <SquarePlus />
           </Button>
         </div>
       </div>
@@ -208,7 +217,8 @@ return (
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className=" text-sm text-muted-foreground">
-          {totalCount} of {table.getRowModel().rows.length} row(s) .
+        {/* {table.getRowModel().rows.length}  of {totalCount} row(s) . */}
+        Total Records : {totalCount}
         </div>
         <Button
           variant="outline"
