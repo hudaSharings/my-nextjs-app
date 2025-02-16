@@ -252,7 +252,7 @@ const actionsColumn = (
         paginationState={pagination}
         onPaginationChange={handlePaginationChange}
         addnew={addnewUser}
-        isLoading={isLoading}
+        isLoading={isLoading||isFetching}
         filterComponent={<UserFilterForm getFilter={handleFilter} />}
       />
 
