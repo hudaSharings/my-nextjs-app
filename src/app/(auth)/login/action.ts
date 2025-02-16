@@ -13,10 +13,10 @@ import { UserInfo } from "@/lib/auth/sessionPayload";
 // };
 
 const loginSchema = z.object({
-  email: z.string().min(3, { message: "userName/Email is required" }),
+  email: z.string().min(4, { message: "userName/Email is required" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 8 characters" })
+    .min(8, { message: "Password must be at least 8 characters" })
     .trim(),
 });
 

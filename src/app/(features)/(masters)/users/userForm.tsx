@@ -32,7 +32,7 @@ import { FormFieldCombobox } from "@/components/formFieldCombobox";
 
 const formSchema = z.object({
   id: z.number().optional(),
-  userName: z.string().min(6),
+  userName: z.string().min(4),
   name: z.string().min(3),
   email: z.string().email(),
   mobileNumber: z.string(),
