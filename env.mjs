@@ -18,6 +18,7 @@ export const env = createEnv({
    */
   client: {
    BASE_URL: z.string().min(1),
+   
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,

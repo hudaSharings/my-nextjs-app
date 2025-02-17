@@ -32,6 +32,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { logToServer } from "@/lib/apiClient";
+
 
 export default function Page() {
   const [openAlertDialog, setOpenAlertDialog] = useState(false);
@@ -49,7 +51,7 @@ export default function Page() {
     } else {
       setOpenDialog(true);
     }
-    queryClient.invalidateQueries({ queryKey: ["users"] });
+   // logToServer("info", "Add new user" , selectedUser);   
   };
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
@@ -70,19 +72,21 @@ export default function Page() {
       title: "User deleted successfully!",
     });
     setOpenAlertDialog(false);
+    logToServer("info", "Delete user invoked" , selectedUser);   
     queryClient.invalidateQueries({ queryKey: ["users"] });
   };
   const handleOnViewUser = (user: User) => {
     redirect(`/users/${user.id}`);
   };
 
-  const handleSubmit = () => {
+  const handleUserFormSubmit = () => {
     // Handle form submission logic here
     setOpenSheet(false);
     setOpenDialog(false);
     toast({
       title: "User details saved successfully!",
     });
+    logToServer("info", selectedUser?"Edit user invoked":"Add new user invoked");   
     queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 
@@ -116,7 +120,7 @@ export default function Page() {
               {selectedUser ? "Edit" : "Add"} the details of user.
             </SheetDescription>
           </SheetHeader>
-          <UserForm user={selectedUser} onSuccess={handleSubmit} />
+          <UserForm user={selectedUser} onSuccess={handleUserFormSubmit} />
         </SheetContent>
       </Sheet>
 
@@ -141,7 +145,7 @@ export default function Page() {
               {selectedUser ? "Edit" : "Add"} the details of user.
             </DialogDescription>
           </DialogHeader>
-          <UserForm user={selectedUser} onSuccess={handleSubmit} />
+          <UserForm user={selectedUser} onSuccess={handleUserFormSubmit} />
         </DialogContent>
       </Dialog>
 
