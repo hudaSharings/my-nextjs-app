@@ -9,7 +9,7 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string(),
-    SESSION_SECRET: z.string().min(1),
+    SESSION_SECRET: z.string()
   },
   /*
    * Environment variables available on the client (and server).
@@ -17,8 +17,8 @@ export const env = createEnv({
    * 💡 You'll get type errors if these are not prefixed with NEXT_PUBLIC_.
    */
   client: {
-    NEXT_PUBLIC_BASE_URL: z.string().min(1),
-    NEXT_PUBLIC_BASE_API_URL: z.string().min(1),
+    NEXT_PUBLIC_BASE_URL: z.string(),
+    NEXT_PUBLIC_BASE_API_URL: z.string(),
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
