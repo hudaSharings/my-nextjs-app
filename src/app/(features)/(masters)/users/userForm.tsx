@@ -230,7 +230,7 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput placeholder="Placeholder" {...field} />
+                <PasswordInput placeholder="" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -247,7 +247,7 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
+                    <SelectValue placeholder="" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
