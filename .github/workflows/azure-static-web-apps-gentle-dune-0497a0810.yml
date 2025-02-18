@@ -33,6 +33,8 @@ jobs:
           
       - name: Install Dependencies
         run: npm install --force
+      - name: command install 
+        run: npm install cmdk --legacy-peer-deps
         
       - name: Build Next.js App
         run: npm run build
