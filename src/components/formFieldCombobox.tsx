@@ -52,7 +52,7 @@ export function FormFieldCombobox({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" style={{ pointerEvents: "auto" }}>
-          <Command>
+          <Command >
             <CommandInput 
               placeholder="Search language..." 
               onFocus={() => setIsPopoverOpen(true)} // Keep the popover open when focused on the input
