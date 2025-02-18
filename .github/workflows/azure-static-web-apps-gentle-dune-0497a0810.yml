@@ -24,7 +24,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18 # Adjust based on your project's requirements
-
+      - name: Set Environment Variables
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_BASE_API_URL=${{ secrets.NEXT_PUBLIC_BASE_API_URL }}" >> $GITHUB_ENV
+          
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
