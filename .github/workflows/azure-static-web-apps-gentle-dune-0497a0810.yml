@@ -32,8 +32,8 @@ jobs:
           echo "NEXT_PUBLIC_BASE_API_URL=${{ secrets.NEXT_PUBLIC_BASE_API_URL }}" >> $GITHUB_ENV
           
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-
+        run: npm ci --legacy-peer-deps
+        
       - name: Build Next.js App
         run: npm run build
         env:
