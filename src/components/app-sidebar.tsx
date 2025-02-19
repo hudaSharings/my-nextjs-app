@@ -17,11 +17,7 @@ import {
   Settings2,
   SquareTerminal,
 } from "lucide-react";
-
-import { NavMain } from "@/components/navs/nav-main";
-import { NavProjects } from "@/components/navs/nav-projects";
 import { NavUser } from "@/components/navs/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -33,16 +29,10 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { NavAttendance } from "./navs/nav-attendace";
-import { NavTimesheet } from "./navs/nav-timesheet";
-import { NavMasters } from "./navs/nav-masters";
 import { NavSetups } from "./navs/nav-setups";
 import Link from "next/link";
 
-import { SessionPayload, UserInfo } from "@/lib/auth/sessionPayload";
-import { useQuery } from "@tanstack/react-query";
-import { getSession } from "@/lib/auth/session";
-import { User } from "@/lib/types";
+import { UserInfo } from "@/lib/auth/sessionPayload";
 
 // This is sample data.
 const data = {
@@ -276,39 +266,40 @@ export function AppSidebar({userInfo, ...props }: React.ComponentProps<typeof Si
     email: userInfo?.email,
   }));
 
-// const {data:userSession} = useQuery({
-//   queryKey: ["userSession"],
-//   queryFn: () => 
-//      getSession()
-// });
-
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+    <Sidebar collapsible="icon" {...props} className="bg-card text-foreground">
+      <SidebarHeader className="text-primary-foreground">
         {/* <TeamSwitcher teams={data.teams} /> */}
-        <div className="flex w-full items-center justify-center ">
-        <img src="fts-logo.png" width="100px" height="50px"/>
+        <div className="flex w-full items-center justify-center">
+          <img src="fts-logo.png" alt="FTS Logo" width="100px" height="50px" />
         </div>
-        
       </SidebarHeader>
-      <SidebarSeparator><hr/></SidebarSeparator>
-      <SidebarContent className="overflow-auto scrollbar-none">
+      <SidebarSeparator>
+        <hr className="border-border" />
+      </SidebarSeparator>
+      <SidebarContent className="overflow-auto scrollbar-none bg-card text-foreground">
         <SidebarMenu className="ml-2 mt-2">
-          <SidebarMenuItem>
+          <SidebarMenuItem className="hover:bg-muted hover:text-muted-foreground dashboard">
             <SidebarMenuButton tooltip="Dashboard">
-              <LayoutDashboard />
-              <Link href="/dashboard">Dashboard</Link>
+              <LayoutDashboard className=" text-primary" />
+              <Link
+                href="/dashboard"
+                className="text-foreground"
+              >
+                Dashboard
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarSeparator><hr/></SidebarSeparator>
+        <SidebarSeparator>
+          <hr className="border-border" />
+        </SidebarSeparator>
         <NavSetups items={data.navSetups} />
-     
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className=" text-muted-foreground">
         <NavUser user={userInfo} />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail className="bg-card text-foreground" />
     </Sidebar>
   );
 }

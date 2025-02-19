@@ -168,6 +168,7 @@ const actionsColumn = (
   return (
     <div className="container ">
       <DataTable
+      key={'user'}
         columns={columns}
         data={data?.data||[]}
         totalCount={data?.totalCount}

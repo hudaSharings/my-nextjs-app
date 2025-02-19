@@ -11,4 +11,13 @@ export interface UserFilter {
   email?: string;
   userType?: string;
 }
+export interface ClientFilter {
+  name?: string;
+  region?: string;
+  country?: string;
+  language?: string;
+}
+
+
 export interface UserSearchParams extends UserFilter, ISearchParams {}
+export interface ClientSearchParams extends ClientFilter, ISearchParams {}

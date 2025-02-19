@@ -99,7 +99,8 @@ const handleRefresh = () => {
 return (
     <div>
       <div className="flex items-center ">
-        <div className="flex w-full  items-center space-x-2 py-2">
+        <div className="flex w-full  items-center space-x-2 py-2 h-8">
+          <div className="mt-6 h-9 flex">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size={"sm"}>
@@ -131,12 +132,15 @@ return (
               variant="outline"
               size={"sm"}
               onClick={() => setShowFilter(!showFilter)}
+              className="ml-2"
             >
               {showFilter ? <FilterX /> : <Filter />}
             </Button>
           )}
+          </div>
           {showFilter && filterComponent}
         </div>
+        <div className="py-2 ml-2 mt-4 flex h-12">
         <div className="ml-auto">
         <Button variant="outline" size={"sm"} className="mr-2" onClick={handleRefresh}>
         <RefreshCcw />
@@ -146,6 +150,7 @@ return (
           <Button variant="outline" size={"sm"} onClick={addnew}>
           <SquarePlus />
           </Button>
+        </div>
         </div>
       </div>
       <div className="rounded-md border">

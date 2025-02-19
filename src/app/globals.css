@@ -62,6 +62,64 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  .lightGreen {
+    --background: 135, 100%, 98%;
+    --foreground: 100% 108%;
+    --card: 135, 100%, 98%;
+    --card-foreground: 100% 108%;
+    --popover: 135, 100%, 98%;
+    --popover-foreground: 100% 108%;
+    --primary: 120 60% 50%;
+    --primary-foreground: 120 20% 98%;
+    --secondary: 120 30% 80%;
+    --secondary-foreground: 100% 108%;
+    --muted: 120 30% 85%;
+    --muted-foreground: 120 6% 27%;
+    --accent: 120 40% 50%;
+    --accent-foreground: 139 29% 90%;
+    --sidebar-accent: 120 40% 50%;
+    --sidebar-accent-foreground: 139 29% 90%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 135, 100%, 98%;
+    --border: 120 30% 80%;
+    --input: 120 30% 85%;
+    --ring: 120 60% 50%;
+    --chart-1: 120 60% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+  .yellowishOrange {
+    --background: 40 100% 99%;
+    --foreground: 40 30% 10%;
+    --card: 40 100% 99%;
+    --card-foreground: 40 30% 10%;
+    --popover: 40 100% 99%;
+    --popover-foreground: 40 30% 10%;
+    --primary: 40 80% 50%;
+    --primary-foreground: 40 30% 98%;
+    --secondary: 40 40% 80%;
+    --secondary-foreground: 40 30% 10%;
+    --muted: 40 63% 78%;
+    --muted-foreground: 40 10% 19%;
+    --accent: 40, 98%, 62%;
+    --accent-foreground: 40 30% 10%;
+    --sidebar-accent: 40, 98%, 62%;
+    --sidebar-accent-foreground: 40 30% 10%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 40 100% 99%;
+    --border: 40 30% 80%;
+    --input: 40 63% 78%;
+    --ring: 40 80% 50%;
+    --chart-1: 40 80% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+  
+  
 }
 
 
@@ -76,4 +134,7 @@ body {
 
 .scrollbar-none {
   scrollbar-width: none;
+}
+.dashboard:hover .lucide-layout-dashboard{
+  color: var(--sidebar-accent-foreground) !important;
 }

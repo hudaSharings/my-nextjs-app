@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { logToServer } from "@/lib/apiClient";
+import { useTheme } from "next-themes";
 
 
 export default function Page() {
@@ -90,6 +91,9 @@ export default function Page() {
     queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 
+  const {theme}  = useTheme();
+
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <h1>Users</h1>
@@ -101,8 +105,8 @@ export default function Page() {
       />
 
       <Sheet open={openSheet} onOpenChange={setOpenSheet}>
-        <SheetContent className="overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 bg-white rounded-lg shadow-lg">
-          <SheetHeader>
+      <SheetContent className={`overflow-y-auto scroll-m-1 max-w-4xl sm:max-w-md md:max-w-2xl lg:max-w-2xl p-8 rounded-lg shadow-lg ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+      <SheetHeader>
             <SheetTitle>
               <div className="flex items-center">
                 {selectedUser ? "Edit" : "Add"} User
@@ -125,8 +129,8 @@ export default function Page() {
       </Sheet>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="overflow-y max-w-4xl p-8 bg-white rounded-lg shadow-lg">
-          <DialogHeader>
+      <DialogContent className={`overflow-y max-w-4xl p-8  rounded-lg shadow-lg ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+      <DialogHeader>
             <DialogTitle>
               <div className="flex items-center">
                 {selectedUser ? "Edit" : "Add"} User

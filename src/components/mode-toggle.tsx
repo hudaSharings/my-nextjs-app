@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const { setTheme ,theme } = useTheme();
+
+
+  React.useEffect(() => {
+    // Apply the current theme class to the <html> element
+    document.documentElement.classList.remove("lightGreen", "yellowishOrange","dark","light");
+    document.documentElement.classList.add(theme!);
+  }, [theme]);
+
 
   return (
     <DropdownMenu>
@@ -30,6 +38,12 @@ export function ModeToggle() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("yellowishOrange")}>
+          Yellow
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("lightGreen")}>
+          Green
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System
