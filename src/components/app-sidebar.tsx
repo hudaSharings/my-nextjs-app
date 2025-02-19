@@ -296,7 +296,7 @@ export function AppSidebar({userInfo, ...props }: React.ComponentProps<typeof Si
         </SidebarSeparator>
         <NavSetups items={data.navSetups} />
       </SidebarContent>
-      <SidebarFooter className=" text-muted-foreground">
+      <SidebarFooter className="">
         <NavUser user={userInfo} />
       </SidebarFooter>
       <SidebarRail className="bg-card text-foreground" />
