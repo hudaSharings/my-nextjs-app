@@ -64,6 +64,7 @@ export default function UserForm({ user,onSuccess }: UserFormProps) {
   });
   const languages = [   
     { label: "English", value: "en" },
+    { label: "Arabic", value: "ar" },
     { label: "French", value: "fr" },
     { label: "German", value: "de" },
     { label: "Spanish", value: "es" },

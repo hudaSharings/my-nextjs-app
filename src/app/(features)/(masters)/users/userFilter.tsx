@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import user from "@/db/schema/users";
 import { UserFilter } from "@/lib/types";
+import { boolean } from "drizzle-orm/mysql-core";
 import { Search } from "lucide-react";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 
 
 type UserFilterProps={
@@ -50,7 +52,7 @@ return (
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyPress}
-            className="mt-1 sm:h-7"
+            className="mt-1 sm:h-8"
           />
           {name && (
             <span
@@ -71,7 +73,7 @@ return (
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             onKeyDown={handleKeyPress}
-            className="mt-1 sm:h-7"
+            className="mt-1 sm:h-8"
           />
           {userName && (
             <span
@@ -93,7 +95,7 @@ return (
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={handleKeyPress}
-            className="mt-1 sm:h-7"
+            className="mt-1 sm:h-8"
           />
           {email && (
             <span
@@ -110,7 +112,7 @@ return (
         <Label htmlFor="email">User Type</Label>
         <div className="flex items-center gap-1">
           <Select value={userType} onValueChange={setUserType} >         
-            <SelectTrigger className="w-[130px] mt-1 sm:h-7">
+            <SelectTrigger className="w-[130px] mt-1 sm:h-8">
               <SelectValue placeholder="" />           
             </SelectTrigger>          
             <SelectContent>
@@ -123,7 +125,7 @@ return (
         </div>
       </div>
       <div className="flex items-end">
-      <Button variant={"outline"} size={"sm"} type="submit" className="mt-1 sm:h-7" >  <Search /></Button>
+      <Button variant={"outline"} size={"sm"} type="submit" className="mt-1 sm:h-8" >  <Search /></Button>
     </div>
     </form>
   </div>

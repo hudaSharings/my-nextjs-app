@@ -15,6 +15,13 @@
       "when": 1739468350384,
       "tag": "0001_init_db",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1739870842956,
+      "tag": "0002_init_db",
+      "breakpoints": true
     }
   ]
 }
