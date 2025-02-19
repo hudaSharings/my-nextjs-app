@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Client } from "@/lib/types/client";
 import { createClient, updateClient } from "@/services/clientService";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FormFieldCombobox } from "@/components/formFieldCombobox";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -39,6 +40,18 @@ type ClientFormProps = {
   };
   export default function ClientForm({ client,onSuccess }: ClientFormProps) {
     const { toast } = useToast();
+    const languages = [   
+      { label: "English", value: "English" },
+      { label: "Arabic", value: "Arabic" },
+      { label: "French", value: "French" },
+      { label: "German", value: "German" },
+      { label: "Spanish", value: "Spanish" },
+      { label: "Portuguese", value: "Portuguese" },
+      { label: "Russian", value: "Russian" },
+      { label: "Japanese", value: "Japanese" },
+      { label: "Korean", value: "Korean" },
+      { label: "Chinese", value: "Chinese" },
+    ];
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
@@ -94,7 +107,8 @@ type ClientFormProps = {
     return (
       <FormProvider {...form}>
         <Form {...form}>
-          <form action={''}
+          <form
+            action={""}
             onSubmit={form.handleSubmit(onSubmit)}
             className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2"
           >
@@ -174,11 +188,11 @@ type ClientFormProps = {
                 <FormItem>
                   <FormLabel>Language</FormLabel>
                   <FormControl>
-                    <Input
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      placeholder=""
-                      type=""
-                      {...field}
+                    <FormFieldCombobox
+                      name="language"
+                      options={languages}
+                      placeholder="Select language"
+                      // description="Choose your preferred language."
                     />
                   </FormControl>
 
@@ -192,14 +206,16 @@ type ClientFormProps = {
               name="isActive"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IsActive  <FormControl>
-                  <Checkbox className="mx-4 "
-                       checked={field.value}
-                       onCheckedChange={field.onChange}
-                     />
-                  </FormControl>
+                  <FormLabel>
+                    IsActive{" "}
+                    <FormControl>
+                      <Checkbox
+                        className="mx-4 "
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormLabel>
-                  
 
                   <FormMessage />
                 </FormItem>
