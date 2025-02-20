@@ -23,8 +23,8 @@ export default function Page() {
     })
         if(isLoading)
             return (
-                <div className="min-h-screen bg-gray-50 p-6">
-                  <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+                <div className="min-h-screen p-6">
+                  <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md shadow-muted">
                   <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-[250px]" />
@@ -35,19 +35,19 @@ export default function Page() {
               )
  
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen p-6">
           {/* Profile Header */}
-          <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+          <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md shadow-muted">
             <div className="flex items-center gap-6">
               {/* Profile Avatar */}
-              <div className="w-20 h-20 bg-blue-200 rounded-full flex items-center justify-center text-2xl text-white font-semibold">
+              <div className="w-20 h-20  rounded-full flex items-center justify-center text-2xl  bg-muted text-muted-foreground font-semibold">
                 {user?.name.charAt(0)} {/* Display first letter of name as initial */}
               </div>
     
               {/* Profile Info */}
               <div>
                 <h1 className="text-3xl font-semibold">{user?.name}</h1>
-                <p className="text-lg text-gray-500">{user?.userName}</p>
+                <p className="text-lg text-muted-foreground">{user?.userName}</p>
               </div>
             </div>
     
@@ -55,22 +55,22 @@ export default function Page() {
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <label className="font-medium text-gray-700">Email:</label>
-                  <span className="text-gray-600">{user?.email}</span>
+                  <label className="font-medium ">Email:</label>
+                  <span className="text-muted-foreground">{user?.email}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <label className="font-medium text-gray-700">Mobile Number:</label>
-                  <span className="text-gray-600">{user?.mobileNumber}</span>
+                  <label className="font-medium">Mobile Number:</label>
+                  <span className="text-muted-foreground">{user?.mobileNumber}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <label className="font-medium text-gray-700">Employee ID:</label>
-                  <span className="text-gray-600">{user?.employeeId}</span>
+                  <label className="font-medium">Employee ID:</label>
+                  <span className="text-muted-foreground">{user?.employeeId}</span>
                 </div>
               </div>
     
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <label className="font-medium text-gray-700">User Type:</label>
+                  <label className="font-medium">User Type:</label>
                   <span className={` ${user?.userType === 'admin' ? 'text-red-500' : 'text-blue-500'}`}>
                     {user?.userType?.toLocaleUpperCase()}
                   </span>
@@ -78,8 +78,8 @@ export default function Page() {
     
                 {/* Password Section (non-editable) */}
                 <div className="flex items-center gap-3">
-                  <label className="font-medium text-gray-700">Password:</label>
-                  <span className="text-gray-600">*******</span>
+                  <label className="font-medium">Password:</label>
+                  <span className="text-muted-foreground">*******</span>
                 </div>
               </div>
             </div>

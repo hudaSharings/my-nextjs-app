@@ -37,6 +37,7 @@ export default function UserTable({onDelete, onEdit, onView,onAddnew}: UserTable
 
   const { data,isLoading ,refetch,isFetching,error } = useQuery<{ data: User[]; totalCount: number }>({
     queryKey: ["users", filter,pagination,sort],
+    refetchOnWindowFocus: false,
     queryFn:async () =>{
       const response = await getUsers({
         pageIndex: pagination.pageIndex, 

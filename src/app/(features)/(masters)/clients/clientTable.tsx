@@ -26,9 +26,11 @@ export default function ClientTable({onDelete, onEdit, onView,onAddnew}: ClientT
 
     const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
     const [filter,SetFilter]=useState<ClientFilter>();
+    const [focus,setFocus] = useState<boolean>(false);
    
      const { data,isLoading ,refetch,isFetching,error } = useQuery<{ data: Client[]; totalCount: number }>({
        queryKey: ["clients", filter,pagination],
+       refetchOnWindowFocus: focus,
        queryFn:async () =>{
          const response = await getClients({
            pageIndex: pagination.pageIndex, 
@@ -131,6 +133,10 @@ export default function ClientTable({onDelete, onEdit, onView,onAddnew}: ClientT
     ...actionsColumn(handleAction),
   ];
      return (
+      <>
+      <div className="text-center">
+        isRefresh On WindowFocus <input type="checkbox" checked={focus} onChange={()=>setFocus(focus?false:true)}></input>
+      </div>
        <DataTable
        key={'client'}
          columns={columns}
@@ -143,6 +149,7 @@ export default function ClientTable({onDelete, onEdit, onView,onAddnew}: ClientT
          addnew={onAddnew}
          referesh={refetch}
        />
+       </>
      )
    
 

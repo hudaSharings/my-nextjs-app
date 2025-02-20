@@ -17,7 +17,17 @@ export interface ClientFilter {
   country?: string;
   language?: string;
 }
+export interface ShiftFilter {
+  name?: string;
+  fromTime?: string;
+  toTime?: string;
+  tolerance?: string;
+  expectedHours?: string;
+  isSplit?: boolean;
+  clientId?: number;
+}
 
 
 export interface UserSearchParams extends UserFilter, ISearchParams {}
 export interface ClientSearchParams extends ClientFilter, ISearchParams {}
+export interface ShiftSearchParams extends ShiftFilter, ISearchParams {}
