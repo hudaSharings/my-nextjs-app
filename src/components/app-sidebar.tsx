@@ -16,6 +16,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  LayoutPanelLeftIcon
 } from "lucide-react";
 import { NavUser } from "@/components/navs/nav-user";
 import {
@@ -150,6 +151,18 @@ const data = {
           url: "/adjustments",
         },
       ],
+    },
+    {
+      title: "Apps4x",
+      url: "#",
+      icon: LayoutPanelLeftIcon,
+      isActive: true,
+      items:[
+        {
+          title:'Home',
+          url:'/apps4x'
+        }
+      ]
     },
   ],
   navMain: [
