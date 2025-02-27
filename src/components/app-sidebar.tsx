@@ -284,7 +284,7 @@ export function AppSidebar({userInfo, ...props }: React.ComponentProps<typeof Si
       <SidebarHeader className="text-primary-foreground">
         {/* <TeamSwitcher teams={data.teams} /> */}
         <div className="flex w-full items-center justify-center">
-          <img src="fts-logo.png" alt="FTS Logo" width="100px" height="50px" />
+          <img src="/fts-logo.png" alt="FTS Logo" width="100px" height="50px" />
         </div>
       </SidebarHeader>
       <SidebarSeparator>

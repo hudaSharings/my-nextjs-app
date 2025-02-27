@@ -1,6 +1,7 @@
 import { useToast } from '@/hooks/use-toast'
 import axios, { 
     AxiosInstance, 
+    AxiosRequestConfig, 
     AxiosResponse,  
     InternalAxiosRequestConfig 
   } from 'axios'
@@ -45,27 +46,27 @@ import axios, {
       }
     }
   
-    protected async post<T, D = unknown>(url: string, data: D): Promise<T> {
+    protected async post<T, D = unknown>(url: string, data: D,config?:AxiosRequestConfig<D>): Promise<T> {
       try {
-        const response: AxiosResponse<T> = await this.axiosInstance.post(url, data)
+        const response: AxiosResponse<T> = await this.axiosInstance.post(url, data,config)
         return response.data
       } catch (error) {
         this.handleError(error)
         throw error
       }
     }
-    protected async put<T, D = unknown>(url: string, data: D): Promise<T> {
+    protected async put<T, D = unknown>(url: string, data: D,config?:AxiosRequestConfig<D>): Promise<T> {
       try {
-        const response: AxiosResponse<T> = await this.axiosInstance.put(url, data)
+        const response: AxiosResponse<T> = await this.axiosInstance.put(url, data,config)
         return response.data
       } catch (error) {
         this.handleError(error)
         throw error
       }
     }
-    protected async delete<T>(url: string): Promise<T> {
+    protected async delete<T>(url: string,config?:AxiosRequestConfig): Promise<T> {
       try {
-        const response: AxiosResponse<T> = await this.axiosInstance.delete(url)
+        const response: AxiosResponse<T> = await this.axiosInstance.delete(url,config)
         return response.data
       } catch (error) {
         this.handleError(error)

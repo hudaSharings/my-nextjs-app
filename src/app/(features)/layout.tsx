@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "../providers";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SidebarSC } from "@/components/sidebar-sc";
+import { ToastContainer } from "react-toastify";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-sm`}
       > <Providers>
         <SidebarProvider>          
           <SidebarSC/> {/* <AppSidebar /> moved into SidebarSC to support session management in server components */}
@@ -66,6 +67,7 @@ export default function RootLayout({
             {children}
           </SidebarInset>
         </SidebarProvider>
+      <ToastContainer theme='colored' autoClose={1500} />
         </Providers>
       </body>
     </html>

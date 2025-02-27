@@ -1,3 +1,5 @@
+@import '../components/css/fontawesome-free/css/all.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -137,4 +139,82 @@ body {
 }
 .dashboard:hover .lucide-layout-dashboard{
   color: var(--sidebar-accent-foreground) !important;
+}
+.group_field.alignment_Left {
+  text-align: left;
+}
+.group_field.alignment_Right {
+  text-align: right;
+}
+.group_field.alignment_Center {
+  text-align: center;
+}
+
+
+.group_field.direction_Horizontal{
+
+  display: -webkit-box;
+	display: -moz-box;
+	display: box;
+
+	-webkit-box-orient: horizontal;
+	-moz-box-orient: horizontal;
+	box-orient: horizontal;
+
+	-webkit-box-pack: start;
+	-moz-box-pack: start;
+	box-pack: start;
+
+	-webkit-box-direction: normal;
+	-moz-box-direction: normal;
+	box-direction: normal;
+
+	-webkit-box-align: start;
+	-moz-box-align: start;
+	box-align: start;
+
+
+}
+.group_field.direction_Horizontal > .form-group {
+  padding-right: 15px;
+}
+.group_field.table .table-row .table-cell:first-child {
+  min-width: 100px;
+  padding-bottom: 7px;
+  padding-right: 20px !important;
+}
+.groupView {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 5px;
+  box-shadow: 0 0 #000 0, 0 0 #000 0, 0 0 #000 0, 0 0 #000 0, 0px 1px 2px rgba(0, 0, 0, .1);
+}
+.groupView .actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 30px;
+}
+.groupView .actions {
+  display: flex;
+  column-gap: 15px;
+  align-items: center;
+}
+.groupView .actions .actionlist {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 3px;
+}
+.groupView .actions .actionlist a {
+  border-right: 1px solid #ddd;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.09) inset;
+  box-shadow: #000 -5px -5px 10px 0px inset;
+  box-shadow: rgba(0, 0, 0, 0.13) -2px -3px 10px 0px inset;
+  padding: 0.5rem 1rem;
+  font-weight: 400;
+  color: #212529;
+}
+.groupView .actions .activitylist button.btn {
+  padding: 0.5rem 1rem;
 }

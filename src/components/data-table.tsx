@@ -176,7 +176,7 @@ return (
           {isLoading == true && (
             <TableBody>
               {[...Array(4)].map((_, index) => (
-                <TableRow key={index}>
+                <TableRow key={'load'+index}>
                   {columns.map((column) => (
                     <TableCell key={column.id}>
                       <Skeleton className="h-4 w-full" />
@@ -190,9 +190,9 @@ return (
             <TableBody>
               {}
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row,index) => (
                   <TableRow
-                    key={row.id}
+                    key={index}
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (

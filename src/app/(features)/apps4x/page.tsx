@@ -1,30 +1,28 @@
 "use client"
 import { AppId, CompanyId } from "@/app/api/baseApiApps4x";
 import { useApi } from "@/app/api/useApi";
-import { apps4xService, responseModel } from "@/services/apps4xService";
+import { apps4xService, FilterDuplicateMetaobject, responseModel } from "@/services/apps4xService";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default  function Apps4x() {
+  const objectTypes: string[] = [
+    "Menu",
+    "Collection",
+    "Entity",
+    "Form",
+    "Query",
+    "Page",
+    "Function"
+  ];
     const { 
         data, 
         loading, 
         error, 
         execute: fetchClients 
       } = useApi<responseModel<any[]>>(() => 
-        apps4xService.getApi(`metaobject/${CompanyId}?objectTypes=Collection&objectTypes=Entity&objectTypes=Query&objectTypes=Page&objectTypes=Function&appId=${AppId}`)
+        apps4xService.getMetaobjectType(objectTypes,AppId)
       )
-      const  FilterDuplicateMetaobject = (res:any[]) =>{
-        let filteredRes:any[]=[];
-        filteredRes = res.filter(
-          (obj, index, self) =>
-             index === self.findIndex((t) => (t.Id === obj.Id && t.Type === obj.Type && t.ParentId === obj.ParentId && 
-              ((t.Status === 'Active') || 
-              (t.Status === 'Draft' && !self.some((x) => x.Id === obj.Id && x.Status === 'Active')))
-             )
-          )
-        );
-        return filteredRes;
-      }
       const Condition = (item:any,Type:string) => {
         let _Condition = item.Type === Type && item.ParentId== AppId
         if(Type === 'Collection'){
@@ -41,9 +39,10 @@ export default  function Apps4x() {
         return(
             FilterDuplicateMetaobject(data?.Data).map((item: any) => (
                 (Condition(item,Type)) &&
+                <Link key={item.Id} href={`/apps4x/${Type==='Workflow'?'Collection':Type}/${item.Id}`}>
               <div key={item.Id} className=" h-28 shadow-md rounded-md shadow-muted">
                 <div className="p-2">
-                  <span className="flex items-center">
+                  <span className="flex items-center"> 
                     <span className="border rounded-sm p-2">
                       <img className="w-6 max-w-full" src={JSON.parse(item.Data).Image ?? 'https://cdn-icons-png.flaticon.com/128/11516/11516912.png'} alt="fts" />
                     </span>
@@ -57,12 +56,15 @@ export default  function Apps4x() {
                   <span >
                   {_entityData.map((entity: any) => (
                     (JSON.parse(entity.Data).CollectionId === item.Id) &&
-                    <a className="p-1 ml-2 text-xs border-2 rounded-md bg-primary text-primary-foreground dark:bg-muted">{entity.Name}</a>
+                    <Link key={entity.Id} className="p-1 ml-2 text-xs border-2 rounded-md bg-primary text-primary-foreground dark:bg-muted" href={`/apps4x/${item.Id}/${entity.Id}`}>
+                      {entity.Name}
+                    </Link>
                   ))}
                   </span>
                   }
                 </div>
               </div>
+              </Link>
             ))
         )
       }
