@@ -12,10 +12,7 @@ import axios, {
     constructor(baseURL: string) {
       this.axiosInstance = axios.create({
         baseURL:'https://apps4x-framework.azurewebsites.net/'+baseURL,
-        timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        timeout: 10000
       })
   
       this.initializeInterceptors()

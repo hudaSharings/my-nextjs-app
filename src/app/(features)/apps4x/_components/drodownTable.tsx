@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useGroupedState } from "../customState";
-import { CheckSingleQuoteReplace, handleBarData } from "../_Details/page";
-import { apps4xService } from "@/services/apps4xService";
+import { CheckSingleQuoteReplace } from "../_Details/page";
+import { apps4xService, handleBarData } from "@/services/apps4xService";
 import { toast } from "react-toastify";
 
 interface DropdownProps {
@@ -9,13 +9,15 @@ interface DropdownProps {
   form:any;
   CloseShowTable:() => void
   OpenTable:() => void
+  ChangeEvent:(data:any,Field:any,value:any) => void
 }
 
 function AutoCompleteDropdown({
   Field,
   form,
   CloseShowTable,
-  OpenTable
+  OpenTable,
+  ChangeEvent
 }:DropdownProps) {
   const { stateObject, setState } = useGroupedState();
 
@@ -176,18 +178,18 @@ function AutoCompleteDropdown({
         if (restData.DataSourceType == "RestApi" || restData.DataSourceType == "RestAPIConnector" || restData.DataSourceType == "SwaggerConnector" || !restData.DataSourceType) {
 
           restData.QueryStrings = restData.QueryStrings.map((x:any) => {
-            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
             return x
           });
 
           restData.Headers = restData.Headers.map((x:any) => {
-            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
             return x
           });
           if(restData.Path && restData.Path.length>0){
             restData.Path.forEach((x:any) => {
              let path = {
-              [x.name]:handleBarData(x.Value, {...arguments[0],...stateObject,_handleData})
+              [x.name]:handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData})
              }
              _handleData = {..._handleData,...path}
             })
@@ -196,8 +198,8 @@ function AutoCompleteDropdown({
             }
           }
 
-          restData.ApiUrl = handleBarData(restData.ApiUrl, {...arguments[0],...stateObject,_handleData});
-          restData.Body = handleBarData(restData.Body, {...arguments[0],...stateObject,_handleData});
+          restData.ApiUrl = handleBarData(restData.ApiUrl, {...arguments[0],...stateObject,..._handleData});
+          restData.Body = handleBarData(restData.Body, {...arguments[0],...stateObject,..._handleData});
           if (restData.Body && restData.BodyType == 'json' && typeof restData.Body == "string") {
             restData.Body = JSON.parse(restData.Body);
           }
@@ -270,7 +272,7 @@ function AutoCompleteDropdown({
             });
         } else if (restData.DataSourceType == "Query") {
           restData.QueryParameter = restData.QueryParameter.map((x:any) => {
-            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+            x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
             return x
           });
           let condition = null;
@@ -279,7 +281,7 @@ function AutoCompleteDropdown({
             if (!Array.isArray(_queryData)) {
               if (_queryData.Condition && _queryData.Condition.length > 0) {
                 _queryData.Condition = _queryData.Condition.map((x: any) => {
-                  x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+                  x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
                   return x;
                 });
                 let _condition = {
@@ -341,7 +343,7 @@ function AutoCompleteDropdown({
               query.Value = _formvalue[query.Value];  //FieldValue  = 
             }
             else {
-              query.Value = handleBarData(query.Value, {...arguments[0],...stateObject,_handleData});
+              query.Value = handleBarData(query.Value, {...arguments[0],...stateObject,..._handleData});
             }
           });
 
@@ -364,7 +366,7 @@ function AutoCompleteDropdown({
                 Value: '',
               };
               filterobj.Field = x.name;
-              let _Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});;
+              let _Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});;
               filterobj.Value = _Value;
               _QueryString.push(filterobj);
             });
@@ -380,7 +382,7 @@ function AutoCompleteDropdown({
               if (EnityData.Condition && EnityData.Condition.length > 0) {
 
                 EnityData.Condition = EnityData.Condition.map((x: any) => {
-                  x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+                  x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
                   return x;
                 });
                 let _condition = {
@@ -451,7 +453,7 @@ function AutoCompleteDropdown({
                       x.Value = _formvalue[x.Value];
                   }
                   else
-                    x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+                    x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
                 }
                 return x;
               });
@@ -621,10 +623,12 @@ function AutoCompleteDropdown({
 }
 const clearSelectedData = (field: any) => {
   setState('selectedValue',null);
+  form[field.Name] = null;
 
   if(field)
     field.showSelectedValues = null;
-  // this.ChangeEvent.emit({ data: null, Field: field, value: null });
+
+  ChangeEvent(null, field, null);
 
 }
 const selectDropDownRow = (row:any, field: any) => { 
@@ -728,7 +732,7 @@ Field.AutoSearchText = _fieldVal;
   if(Field)
   Field.showSelectedValues = showValue;
 
-  // this.ChangeEvent.emit({ data: row, Field: Field,value:_fieldVal });
+  ChangeEvent(row, Field,_fieldVal);
 }
 const loadDropdownColumn = (field: any,isFieldType?:boolean) => {
     
@@ -826,11 +830,13 @@ const LoadBody = (val:any, i:number,level:number) => {
             <i className="tabler-ti ti-check text-theme"></i>
             <input
               type="checkbox"
+              defaultChecked={false}
               checked={stateObject?.selectedValue?.includes(
                 getSingleRowFieldValue(val, Field)
               )}
               name={Field.Name}
               className="themecolor"
+              readOnly
             />
           </span>
         </td>
@@ -883,7 +889,7 @@ useEffect(() => {
 },[Field.showTable])
 
   useEffect(() => {
-    setState('selectedValue',Field.showSelectedValues);
+    setState('selectedValue',Field.showSelectedValues?Field.showSelectedValues:form[Field.Name]);
   }, [Field.showSelectedValues]);
   useEffect(() => {
     loadDropdownColumn(Field);
@@ -894,19 +900,20 @@ useEffect(() => {
       <div className="control-input">
 
         <label onClick={loadTable}
-          className={`form-control m-0 relative field_data autoComplete_dropdown_label block w-48 h-8 p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 
+          className={`form-control m-0 relative field_data autoComplete_dropdown_label block w-full h-8 p-2 border rounded-md shadow-sm focus:ring focus:ring-blue-300 
           ${Field.Mandatory && !stateObject?.selectedValue ? "border-red is-invalid" : ""} 
           ${stateObject?.showTable || stateObject?.selectedValue ? "isfloatingfocus" : ""} 
           ${showAutoSearchTextBox(Field) && !stateObject?.selectedValue ? "p-0" : ""}`}
           
         > 
           {Field.showSelectedValues || stateObject?.selectedValue && stateObject.selectedValue}
-          {stateObject?.selectedValue && (
+          
+        </label>
+        {stateObject?.selectedValue && (
             <span className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={() => clearSelectedData(Field)}>
-              <i className="tabler-ti ti-square-rounded-x text-gray-500 hover:text-red-500"></i>
+              x
             </span>
           )}
-        </label>
       </div>
 
       {stateObject?.showTable && (

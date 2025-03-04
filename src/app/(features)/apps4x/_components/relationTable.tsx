@@ -3,18 +3,19 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 import { useGroupedState } from "../customState";
-import { apps4xService } from "@/services/apps4xService";
+import { apps4xService, handleBarData } from "@/services/apps4xService";
 import { toast } from "react-toastify";
-import { handleBarData } from "../_Details/page";
 
 type props = {
   Field: any;
   form : any;
+  ChangeEvent:(data:any,Field:any,value:any) => void
 }
 
 export default function RelationTable({
   Field,
-  form
+  form,
+  ChangeEvent
 }: props) {
     const { stateObject, setState } = useGroupedState();
   const [showTable, setShowTable] = useState(false);
@@ -32,9 +33,7 @@ export default function RelationTable({
     setState('selectedRow',null);
     setState('selectdRelationEntityField', null);
     setState('selectdRelationDisplayField', null);
-    if (form)
-        form[Field.Name]  = null;
-    // this.ChangeEvent.emit({ data: null, Field: this.Field, value: this.selectdRelationEntityField });
+    ChangeEvent(null,Field,null);
   }
   const getRelationEntityData = (load?:boolean,selectdRelationEntityField?:string,selectdRelationDisplayField?:string) => {
 
@@ -104,7 +103,7 @@ export default function RelationTable({
           if (EnityData.Condition && EnityData.Condition.length > 0) {
 
             EnityData.Condition = EnityData.Condition.map((x: any) => {
-              x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,_handleData});
+              x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
               return x;
             });
             let _condition = {
@@ -141,7 +140,7 @@ export default function RelationTable({
       setState('selectedRow', _selectedRow);
       setState('selectdRelationEntityField', _selectdRelationEntityField);
       setState('selectdRelationDisplayField', _selectdRelationDisplayField);
-      setSelectedValue(_selectdRelationEntityField);
+      // setSelectedValue(_selectdRelationEntityField);
     },
       (error) => {
 
@@ -192,58 +191,50 @@ export default function RelationTable({
         setState('selectdRelationEntityField', null);
         setState('selectdRelationDisplayField', null);
     }
-    if(form)
-        form[Field.Name] = data?[Field.RelationEntityField]:null;
       
-    //   this.ChangeEvent.emit({data:data , Field:this.Field,value:this.selectdRelationEntityField});
+      ChangeEvent(data,Field,data?data[Field.RelationEntityField]:null);
     setShowTable(false);
    }
 
   useEffect(() => {
     getRelationEntityLookupField();
+  }, []);
 
+  useEffect(() => {
     
     if(Field.showSelectedValues){
-        setState('selectdRelationDisplayField',Field.showSelectedValues);
-    }
-    if(form && form[Field.Name]){
-        setState('selectdRelationEntityField',form[Field.Name]);
-        getRelationEntityData(true,form[Field.Name],Field.showSelectedValues);
-    }
+      setState('selectdRelationDisplayField',Field.showSelectedValues);
+  }
+  if(form && form[Field.Name]){
+      setState('selectdRelationEntityField',form[Field.Name]);
+      getRelationEntityData(true,form[Field.Name],Field.showSelectedValues);
+  }
 
-    setSelectedValue(Field.showSelectedValuesd? Field.showSelectedValues: (form[Field.Name]?form[Field.Name]: null))
-
-
-    // function handleClickOutside(event: MouseEvent) {
-    //   if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && (dropdownRef.current.id != "label" && dropdownRef.current.localName != "label") ) {
-    //     setShowTable(false);
-    //   }
-    // }
-    // document.addEventListener("mousedown", handleClickOutside);
-    // return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  setSelectedValue(Field.showSelectedValues? Field.showSelectedValues: (form[Field.Name]?form[Field.Name]: null))
+  },[form])
 
   return (
     <div id={`relation_autoComplete_dropdown_${Field.Name}`} className={cn("relative", { "show-table": showTable })}>
       <div className="relative" id='label'>
         <label
           className={cn(
-            "block w-48 h-8 cursor-pointer rounded border border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200", 
+            "block w-full h-8 cursor-pointer rounded border border-gray-300 bg-white px-4 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200", 
             { "border-red-500": Field.Mandatory && !selectedValue }
           )}
           onClick={loadRelationTable}
         >
             {selectedValue}
-          {selectedValue && (
+          
+        </label>
+        {selectedValue && (
             <span className="absolute right-2 top-2 cursor-pointer text-gray-500 hover:text-gray-700" onClick={clearSelectedData}>
               <X size={16} />
             </span>
           )}
-        </label>
       </div>
       {showTable && (
-        <div ref={dropdownRef} className="absolute left-0 top-full mt-2 rounded-lg border border-gray-300 bg-white shadow-lg">
-          <Table>
+        <div ref={dropdownRef} className="absolute left-0 top-full mt-2 rounded-lg border border-gray-300 bg-white shadow-lg z-10">
+          <Table className="min-w-64 p-2">
             <TableHeader>
               <TableRow>
               {stateObject?.RelationColumnDefs && stateObject.RelationColumnDefs.map((col:any,index:number) => (

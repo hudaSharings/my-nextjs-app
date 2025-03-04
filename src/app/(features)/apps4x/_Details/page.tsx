@@ -6,12 +6,13 @@ import {
     DialogTitle,
   } from "@/components/ui/dialog";
 import { useTheme } from "next-themes";
-import GroupField from "../_components/Fields";
-import { apps4xService, checkConditionValidate, FilterDuplicateMetaobject } from "@/services/apps4xService";
+import { apps4xService, checkConditionValidate, FilterDuplicateMetaobject, handleBarData } from "@/services/apps4xService";
 import { useApi } from "@/app/api/useApi";
 import { useEffect } from "react";
 import { useGroupedState } from "../customState";
-import { toast } from 'react-toastify';
+import GroupView from "../_components/Views";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import ActionForm from "../_ActionForm/page";
 type Props = {
     CloseDialog:() => void;
     openDialog:boolean;
@@ -117,26 +118,26 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
         Forms.forEach((form: any) => {
           let _action: any = { Id: form.FormId, Name: form.Name, MethodType: "Action", NoRefresh: false,IconName:null, }
           if (form.Config) {
-            let data: any = JSON.parse(form.Config);
-            setState('showSwal',data.showSwal);
-            if (data?.IsNoActionRefresh)
-            _action.NoRefresh = data?.IsNoActionRefresh;
-            _action.IconName = data.IconName;
-            _action.Order = data.Order;
-            _action.IconName = data.IconName;
-            _action.Name = data.Title?data.Title:_action.Name;
+            let _data: any = JSON.parse(form.Config);
+            setState('showSwal',_data.showSwal);
+            if (_data?.IsNoActionRefresh)
+            _action.NoRefresh = _data?.IsNoActionRefresh;
+            _action.IconName = _data.IconName;
+            _action.Order = _data.Order;
+            _action.IconName = _data.IconName;
+            _action.Name = _data.Title?_data.Title:_action.Name;
   
-            if (data?.ActionVisible && data.ActionCondition && data.ActionCondition.Condition && data.ActionCondition.Condition.length > 0) {
-              let isConditionPassed: boolean = onRulesConditionCheck(data.ActionCondition, stateObject?.DetailsData);
+            if (_data?.ActionVisible && _data.ActionCondition && _data.ActionCondition.Condition && _data.ActionCondition.Condition.length > 0) {
+              let isConditionPassed: boolean = onRulesConditionCheck(_data.ActionCondition, stateObject?.DetailsData);
               if (isConditionPassed) {
-                if (data.ActionType == "Activity") {
+                if (_data.ActionType == "Activity") {
                   _ActivityList.push(_action);
                 }
                 else
                 _gridActionList.push(_action);
               }
             } else {
-              if (data.ActionType == "Activity" || form.Type == "Activity") {
+              if (_data.ActionType == "Activity" || form.Type == "Activity") {
                 _ActivityList.push(_action);
                 }
                 else
@@ -226,8 +227,8 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
             Parameter = _param.map((x: any) => {
               x.Value = handleBarData(x.Value, {
                 ...arguments[0],
-                stateObject,
-                _handleData,
+                ...stateObject,
+                ..._handleData,
               });
               return x;
             });
@@ -256,7 +257,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
           EntityData = JSON.parse(formData.OnSaveDSData);
           let data: any = {};
           EntityData.QueryStrings.forEach((x:any) => {
-            x.Value =handleBarData(x.Value,{...arguments[0],...stateObject,_handleData});
+            x.Value =handleBarData(x.Value,{...arguments[0],...stateObject,..._handleData});
             if (x.Value)
               data[x.name] = x.Value;
           });
@@ -316,40 +317,40 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
               if(RestData.Path && RestData.Path.length>0){
                 RestData.Path.forEach((x:any) => {
                  let path = {
-                  [x.name]:handleBarData(x.Value,{...arguments[0],...stateObject,_handleData})
+                  [x.name]:handleBarData(x.Value,{...arguments[0],...stateObject,..._handleData})
                  }
       
               _handleData = {..._handleData,...path}
                 })
-                RestData.ApiUrl = handleBarData(RestData.ApiUrl,{...arguments[0],...stateObject,_handleData});
+                RestData.ApiUrl = handleBarData(RestData.ApiUrl,{...arguments[0],...stateObject,..._handleData});
                 if(RestData.ApiUrl){
                   RestData.ApiUrl = CheckSingleQuoteReplace(RestData.ApiUrl)
                 }
               }
     
-          RestData.ApiUrl = handleBarData(RestData.ApiUrl,{...arguments[0],...stateObject,_handleData});
+          RestData.ApiUrl = handleBarData(RestData.ApiUrl,{...arguments[0],...stateObject,..._handleData});
           if (RestData.Body && RestData.BodyType == 'json' && typeof RestData.Body == "string") {
-            RestData.Body = handleBarData(RestData.Body,{...arguments[0],...stateObject,_handleData});
+            RestData.Body = handleBarData(RestData.Body,{...arguments[0],...stateObject,..._handleData});
             RestData.Body = JSON.parse(RestData.Body);
           }
           else if (RestData.Body && RestData.BodyType == 'stringfyjson' && typeof RestData.Body == "string") {
             RestData.Body = JSON.parse(RestData.Body);
             Object.keys(RestData.Body).forEach(x => {
     
-              RestData.Body[x] = handleBarData(RestData.Body[x],{...arguments[0],...stateObject,_handleData});
+              RestData.Body[x] = handleBarData(RestData.Body[x],{...arguments[0],...stateObject,..._handleData});
             });
           }
           else
-            RestData.Body = handleBarData(RestData.Body,{...arguments[0],...stateObject,_handleData});
+            RestData.Body = handleBarData(RestData.Body,{...arguments[0],...stateObject,..._handleData});
         if(RestData.QueryStrings){
           RestData.QueryStrings = RestData.QueryStrings.map((x:any) => {
-            x.Value = handleBarData(x.Value,{...arguments[0],...stateObject,_handleData});
+            x.Value = handleBarData(x.Value,{...arguments[0],...stateObject,..._handleData});
             return x
           });
         }
           if(RestData?.Headers){
           RestData.Headers = RestData.Headers.map((x:any) => {
-            x.Value = handleBarData(x.Value,{...arguments[0],...stateObject,_handleData});
+            x.Value = handleBarData(x.Value,{...arguments[0],...stateObject,..._handleData});
             return x
           });
         }
@@ -411,7 +412,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
           if(_con.FieldType) {
     
              if (_con.FieldType == "Value"  || _con.FieldType == "Formula") {
-              _fieldValue = handleBarData(_con.Field, {...arguments[0],...stateObject,_handleData})
+              _fieldValue = handleBarData(_con.Field, {...arguments[0],...stateObject,..._handleData})
             }
     
           }
@@ -421,7 +422,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
           if(_con.ValueType) {
     
              if( _con.ValueType == "Value"  || _con.ValueType == "Formula") {
-              value = handleBarData(_con.Value, {...arguments[0],...stateObject,_handleData})
+              value = handleBarData(_con.Value, {...arguments[0],...stateObject,..._handleData})
             }
     
           }
@@ -471,8 +472,8 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
       if (type == "Submit") {
         let needRefresh: boolean = true;
         if (stateObject?.selectedActionForm && stateObject.selectedActionForm?.Config) {
-          let data = JSON.parse(stateObject.selectedActionForm.Config);
-          if (data?.IsNoActionRefresh)
+          let _data = JSON.parse(stateObject.selectedActionForm.Config);
+          if (_data?.IsNoActionRefresh)
             needRefresh = false;
         }
         if (needRefresh) {
@@ -504,8 +505,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
 
     useEffect(() => {
       loadActionForm();
-    },[stateObject?.ActionForm])
-
+    },[stateObject?.ActionForm]);
     return (
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Dialog open={openDialog} onOpenChange={CloseDialog}>
@@ -581,11 +581,12 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
                 </div>
               </div>
               <div className="groupView-content">
-                <GroupView
+                <GroupView key={formData.FormId}
                   PageGroup={stateObject?.PageGroup}
                   data={stateObject?.DetailsData}
                   formData={formData}
                   type="Details"
+                  submitFormValue={()=>console.log("submitFormValue")}
                 ></GroupView>
               </div>
             </div>
@@ -594,84 +595,19 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
         {stateObject?.selectedActionForm &&
           stateObject?.selectedActionForm.FormId &&
           stateObject?.selectedActionFormConfig.DirectAction !== true && (
-            <Dialog
-              open={stateObject?.showActionForm}
-              onOpenChange={CloseActionForm}
-            >
-              <DialogContent
-            onInteractOutside={(e) => e.preventDefault()}
-            className={`p-8 overflow-y-auto max-h-full rounded-lg shadow-lg ${
-              theme === "dark" ? "bg-gray-900" : "bg-white"
-            }`}
-          >
-            <DialogHeader>
-              <DialogTitle>
-                <div className="flex items-center">
-                  {(stateObject.selectedActionFormConfig?.Title)?
-                  (stateObject.selectedActionFormConfig.Title):
-                  stateObject.selectedActionForm?.Name}</div>
-              </DialogTitle>
-
-              <DialogDescription>{/*  */}</DialogDescription>
-            </DialogHeader>
-
-            {<GroupView 
-            PageGroup={JSON.parse(stateObject.selectedActionForm.ObjectData).PageGroup}
-            data={stateObject?.DetailsData}
-            formData={stateObject.selectedActionForm}
-            type="Create"></GroupView>}
-            
-          </DialogContent>
-            </Dialog>
+            <ActionForm
+              CloseActionForm={(type) => CloseActionForm(type)}
+              showActionForm={stateObject?.showActionForm}
+              ActionForm={stateObject?.selectedActionForm}
+              ActionFormConfig={stateObject?.selectedActionFormConfig}
+              Data={stateObject?.DetailsData}
+              Fields = {stateObject?.EntityDetails?.Fields}
+              EntityId={EntityId}
+            ></ActionForm>
           )}
       </div>
     );
 }
-
-
-import Handlebars from "handlebars";
-import GroupView from "../_components/Views";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-
-const getCookies = () => {
-  let cookies = document.cookie.split("; ");
-  let cookieObj: Record<string, string> = {};
-  cookies.forEach((cookie) => {
-    let [key, value] = cookie.split("=");
-    if (key) cookieObj[key] = value;
-  });
-  return cookieObj;
-};
-
-export const handleBarData = (_code: string, data: Record<string, any> = {}) => {
-  if (typeof data !== "object") data = {};
-
-  const queryParams = Object.fromEntries(new URLSearchParams(window.location.search));
-  if (Object.keys(queryParams).length) data.Query = queryParams;
-  data.Current = data;
-  data.Local = localStorage;
-  if (localStorage.getItem("userInfo")) {
-    data.LocalUserInfo = JSON.parse(localStorage.getItem("userInfo") as string);
-  }
-  if (localStorage.getItem("CommonNavbarSearch")) {
-    data.NavbarSearchData = JSON.parse(localStorage.getItem("CommonNavbarSearch") as string);
-  }
-
-  data.Cookies = getCookies();
-
-  data.System = (window as any).globalService?.SystemConfigs || {};
-  data.Parameter = (window as any).globalService?.SysParameter || {};
-  data.Global = (window as any).globalService || {};
-
-  data.PageData = (window as any).pageService?.PageAllData || {};
-
-  if (_code) {
-    const template = Handlebars.compile(_code);
-    return template(data);
-  }
-
-  return _code;
-};
 export const CheckSingleQuoteReplace = (data:string) => {
   let result = '';
   for (const char of data) {

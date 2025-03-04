@@ -1,5 +1,6 @@
 import { BaseApiService, CompanyId } from "@/app/api/baseApiApps4x"
 import { apps4xApiUrls } from "./apps4xApis";
+import Handlebars from "handlebars";
 
 class Apps4xService extends BaseApiService {
   constructor() {
@@ -72,8 +73,11 @@ class Apps4xService extends BaseApiService {
     return await this.getApi(url);
   }
 
-  async getDynamicDetails(EntityId:string, RecId:number) {
+  async getDynamicDetails(EntityId:string, RecId:number,PrimaryId?:any) {
     let url = apps4xApiUrls.getDynamicDetails(CompanyId,EntityId,RecId);
+    if (PrimaryId) {
+      url = apps4xApiUrls.getDynamicDetailsbyPrimaryValue(CompanyId,EntityId, PrimaryId);
+    }
     return await this.getApi(url);
   }
   async getDyamicQueryData(EntityObjectsId:string,Parameter?:any, Condition?:any,
@@ -168,6 +172,85 @@ class Apps4xService extends BaseApiService {
   async getSingleMetaObjectByRecId(RecId:number) {
     let url = apps4xApiUrls.getSingleMetaObjectByRecId(CompanyId,RecId);
     return await this.getApi(url);
+  }
+  async PostDyamicLogicData(EntityObjectsId:string, _FormData:any,_RowData:any) {
+
+    let obj = {
+      FormData: _FormData,
+      RowData:_RowData
+    };
+    console.log(obj);
+    let url = apps4xApiUrls.DynamicLogic(CompanyId,EntityObjectsId);
+    return await this.post(url,obj);
+  
+  }
+
+  async DynamicInsert(data: any,fileObj?: any[], FormFieldFile?: any[]){
+    let formData: FormData = new FormData();
+    formData.append('EntityData', data);
+    
+    let url = apps4xApiUrls.DynamicInsert(CompanyId);
+
+    if (fileObj && fileObj.length > 0) {
+      
+      for (let i = 0; i < fileObj.length; i++) {
+        formData.append('Files', fileObj[i].File, fileObj[i].File.name);
+      }
+   
+      const DoctypeIds = fileObj.map((x) => 'DoctypeIds=' + x.DoctypeIds).join('&');
+
+      url = `${url}?${DoctypeIds}`;
+    }
+
+    if (FormFieldFile && FormFieldFile.length > 0) {
+      for (let i = 0; i < FormFieldFile.length; i++) {
+        formData.append('Files', FormFieldFile[i].File, FormFieldFile[i].File.name);
+      }
+      const FieldNames = FormFieldFile.map((x) => 'FieldName=' + x.Field).join('&');
+      if (url.includes("?"))
+        url = `${url}&${FieldNames}`;
+      else
+        url = `${url}?${FieldNames}`;
+
+    }
+
+    
+    return await this.post(url,formData);
+  }
+
+  async DynamicUpdate(data: any,fileObj?: any[], FormFieldFile?: any[]) { 
+    let formData: FormData = new FormData();
+    formData.append('EntityData', data);
+    let url = apps4xApiUrls.DynamicUpdate(CompanyId);
+
+    
+    if (fileObj && fileObj.length > 0) {
+      for (let i = 0; i < fileObj.length; i++) {
+        formData.append('Files', fileObj[i].File, fileObj[i].File.name);
+      }
+   
+      const DoctypeIds = fileObj.map((x) => 'DoctypeIds=' + x.DoctypeIds).join('&');
+
+      url = `${url}?${DoctypeIds}`;
+    }
+
+    if (FormFieldFile && FormFieldFile.length > 0) {
+      for (let i = 0; i < FormFieldFile.length; i++) {
+        formData.append('Files', FormFieldFile[i].File, FormFieldFile[i].File.name);
+      }
+      const FieldNames = FormFieldFile.map((x) => 'FieldName=' + x.Field).join('&');
+      if (url.includes("?"))
+        url = `${url}&${FieldNames}`;
+      else
+        url = `${url}?${FieldNames}`;
+
+    }
+
+    return await this.put(url,formData);
+  }
+  async DynamicDelete(EntityId: any, recid: number) { 
+    let url = apps4xApiUrls.DynamicDelete(CompanyId,EntityId,recid);
+    return await this.delete(url);
   }
 
   async getApi(url:string,params: {
@@ -483,4 +566,83 @@ export function checkConditionValidate(Type:any, LHS:any, RHS:any) {
       break
   }
   return _Icondition
+}
+export function DateTimeFormater(_date:any) {
+  var todayTime = new Date(_date);
+  let month: any = (todayTime.getMonth() + 1);
+  month = month > 9 ? month : "0" + month;
+  var day = todayTime.getDate() > 9 ? todayTime.getDate() : "0" + todayTime.getDate();
+  var year = todayTime.getFullYear();
+
+  var Hours = todayTime.getHours() > 9 ? todayTime.getHours() : "0" + todayTime.getHours();
+  var min = todayTime.getMinutes() > 9 ? todayTime.getMinutes() : "0" + todayTime.getMinutes();
+  var sec = todayTime.getSeconds() > 9 ? todayTime.getSeconds() : "0" + todayTime.getSeconds();
+
+  return year + '-' + month + '-' + day + "T" + Hours + ":" + min + ":" + sec + ".000Z";
+  // "2022-01-23T09:04:45.904Z"
+}
+const getCookies = () => {
+  let cookies = document.cookie.split("; ");
+  let cookieObj: Record<string, string> = {};
+  cookies.forEach((cookie) => {
+    let [key, value] = cookie.split("=");
+    if (key) cookieObj[key] = value;
+  });
+  return cookieObj;
+};
+export const handleBarData = (_code: string, data: Record<string, any> = {}) => {
+  if (typeof data !== "object") data = {};
+
+  const queryParams = Object.fromEntries(new URLSearchParams(window.location.search));
+  if (Object.keys(queryParams).length) data.Query = queryParams;
+  data.Current = data;
+  data.Local = localStorage;
+  if (localStorage.getItem("userInfo")) {
+    data.LocalUserInfo = JSON.parse(localStorage.getItem("userInfo") as string);
+  }
+  if (localStorage.getItem("CommonNavbarSearch")) {
+    data.NavbarSearchData = JSON.parse(localStorage.getItem("CommonNavbarSearch") as string);
+  }
+
+  data.Cookies = getCookies();
+
+  // data.System = (window as any).globalService?.SystemConfigs || {};
+  // data.Parameter = (window as any).globalService?.SysParameter || {};
+  // data.Global = (window as any).globalService || {};
+
+  // data.PageData = (window as any).pageService?.PageAllData || {};
+
+  if (_code) {
+    const template = Handlebars.compile(_code);
+    return template(data);
+  }
+
+  return _code;
+};
+export const downloadFile = (blob: any, type: string, filename: string)=>{
+  {
+   var binaryData = [];
+   binaryData.push(blob);
+
+   let filetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+   if(type != null && type != undefined){
+    filetype = type;
+   }
+
+   const url = window.URL.createObjectURL(
+     new Blob(binaryData, {
+       type:filetype,
+     })
+   ); // <-- work with blob directly
+
+   // create hidden dom element (so it works in all browsers)
+   const a = document.createElement("a");
+   a.setAttribute("style", "display:none;");
+   document.body.appendChild(a);
+
+   a.href = url;
+   a.download = filename;
+   a.click();
+ }
 }

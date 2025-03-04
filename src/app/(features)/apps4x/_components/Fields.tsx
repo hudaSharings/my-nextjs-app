@@ -1,4 +1,4 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -19,41 +19,24 @@ import { useGroupedState } from "../customState";
 import { useEffect } from "react";
 import DropDownTable from "./drodownTable";
 import RelationTable from "./relationTable";
-
 type props= {
     fields:any[],
     data:any,
-    type: 'Details' | 'Create' ;
+    type: 'Details' | 'Create' | 'Edit';
+    form:UseFormReturn<any>|null;
+    FieldChangeEvent:(form:UseFormReturn<any>, FieldData: any,RestData: any) => void
   }
 
-const GroupField = ({ fields, data , type}:props) => {
+const GroupField = ({ form, fields, data: Data , type , FieldChangeEvent}:props) => {
     const { stateObject, setState } = useGroupedState();
   
     const getdownloadFileUrl = (field: any) => {
         let _url = "";
-        if (data[field.Name + "_Path"])
-          _url = 'https://apps4x-framework.azurewebsites.net/' + data[field.Name + "_Path"];
-        else if (data[field.Name])
-          _url = 'https://apps4x-framework.azurewebsites.net/' + data[field.Name];
+        if (Data[field.Name + "_Path"])
+          _url = 'https://apps4x-framework.azurewebsites.net/' + Data[field.Name + "_Path"];
+        else if (Data[field.Name])
+          _url = 'https://apps4x-framework.azurewebsites.net/' + Data[field.Name];
         return _url
-      }
-      const Correctdatavalue = (Name:any)  =>  {
-        let _data = Object.entries(data).map((x:any) => {
-          if(typeof x[1] === 'boolean'){
-            x[1] = String(x[1]);
-          }
-          return x;
-        });
-         let Correctdata = Object.fromEntries(_data);
-       return Correctdata[Name];
-      }
-      const initialFormState = fields.reduce(
-        (acc, field) => ({ ...acc, [field.Name]: Correctdatavalue(field.Name) }),
-        {}
-      );
-      const form = useForm({defaultValues:initialFormState});
-      const onSubmit = (values:any) => {
-
       }
       const setDropdownFieldOption = () => {
         let _dropdownField:any[] = [];
@@ -109,7 +92,23 @@ const GroupField = ({ fields, data , type}:props) => {
         });
         setState('fields',_fields);
       }
+      const changeFiledValue = (event:any, item:any, SelectedObj?:any) => {
+        if(form){
+        if (event !== "" && event && event.target) {
+          let val: any = (event.target as HTMLInputElement)?.value;
+          let el = (document.getElementById(item.Name) as HTMLInputElement);
+          el.value = val;
+          form.setValue(item.Name, val);
+          FieldChangeEvent(form,item,val);
+        }else{
+          form.setValue(item.Name, SelectedObj);
+        FieldChangeEvent(form,item,SelectedObj);
 
+        }
+      }
+      }
+
+      
       useEffect(() => {
         if(fields && fields.length>0){
         setDropdownFieldOption();
@@ -120,10 +119,10 @@ const GroupField = ({ fields, data , type}:props) => {
     return (
       <>
       {type === 'Details' && 
-      <div className="group_field table w-100">
+      <div className="group_field table w-100" id={type}>
         {fields.map((field:any, index:number) => (
           <div
-            key={index}
+            key={index+type}
             className={`form-group table-row field_view_${field.DataType} ${field.Config?.Class??''} ${field.Hide ? 'hidden' : ''} ${field.Readonly ? 'inactiveLink' : ''}`}
             style={{
               width: field.Config?.Width ? `${field.Config.Width}%` : undefined,
@@ -142,7 +141,7 @@ const GroupField = ({ fields, data , type}:props) => {
               </label>
             )}
             <div className="table-cell px-2 field_value">
-              {data && (
+              {Data && (
                 field.DataType === E_FieldDataType.Image ? (
                   <div className="profile-user-img img-rounded mb-2">
                     {getdownloadFileUrl(field) && (
@@ -154,11 +153,11 @@ const GroupField = ({ fields, data , type}:props) => {
                     )}
                   </div>
                 ) : field.Name === "Status" ? (
-                  <span className={`grid-field-tag tag_${data[field.Name]}`}>
-                    {data[field.Name]}
+                  <span className={`grid-field-tag tag_${Data[field.Name]}`}>
+                    {Data[field.Name]}
                   </span>
                 ) : (
-                   data[field.Name]
+                   Data[field.Name]
                 )
               )}
             </div>
@@ -166,19 +165,18 @@ const GroupField = ({ fields, data , type}:props) => {
         ))}
       </div>
       }
-      {type === 'Create' && 
-      <div className="container flex flex-col">
+      {(type === 'Create' && form) && 
+      <>
+      <div className="container mx-auto">
         <FormProvider {...form}>
         <Form {...form}>
           <form
-            action={""}
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2"
+            className=""
           >
             {stateObject?.fields && stateObject.fields.map((field:any, index:number) => (
           <div
             key={index}
-            className={`flex my-2 field-row ${field.Hide ? 'hidden' : ''} ${field.Readonly ? 'inactiveLink' : ''}`}
+            className={`my-2 field-row ${field.Hide ? 'hidden' : ''} ${field.Readonly ? 'inactiveLink' : ''}`}
             style={{
               width: field.Config?.Width ? `${field.Config.Width}%` : undefined,
               height: field.Config?.Height ? `${field.Config.Height}px` : undefined,
@@ -190,7 +188,7 @@ const GroupField = ({ fields, data , type}:props) => {
               background: field.Config?.bgcolor,
             }}
           >
-            <div className="flex">
+            <div className="">
             <FormField
               control={form.control}
               name={field.Name}
@@ -200,7 +198,8 @@ const GroupField = ({ fields, data , type}:props) => {
                   {field.DataType == "DropDown" ? (
                     <>
                     {isDynamicDDL(field)?(
-                      <DropDownTable Field={field} form={form.getValues()} OpenTable={() =>showtable(field)} CloseShowTable={() =>showtable(field)} ></DropDownTable>
+                      <DropDownTable Field={field} form={form.getValues()} OpenTable={() =>showtable(field)} CloseShowTable={() =>showtable(field)} 
+                      ChangeEvent={(_data,field,value) => changeFiledValue(null,field,value,)}></DropDownTable>
                     ):(
                       <>
                       <Select onValueChange={_field.onChange} defaultValue={_field.value}>
@@ -211,7 +210,7 @@ const GroupField = ({ fields, data , type}:props) => {
                       </FormControl>
                       <SelectContent>
                         {getDDLItems(field).map((item:any,Index:number)=>(
-                          <SelectItem key={item.value+Index} value={item.value}>{item.text}</SelectItem>
+                          <SelectItem key={item.value+Index} value={item.value} onClick={() => changeFiledValue("",field,item.value)}>{item.text}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -220,10 +219,10 @@ const GroupField = ({ fields, data , type}:props) => {
                   )}
                     </>
                     ):(field.DataType === "Relation"?(
-                      <RelationTable Field={field} form={form.getValues()}></RelationTable>
+                      <RelationTable Field={field} form={form.getValues()} ChangeEvent={(_data,field,value) => changeFiledValue(null,field,value)}></RelationTable>
                     ):<FormControl>
                     <Input className="w-full p-2 border border-gray-300 rounded-md" 
-                    placeholder={field.Label} type="text" {..._field} />                    
+                    placeholder={field.Label} type="text" id={field.Name} {..._field} onChange={(e) => changeFiledValue(e,field,_field.value)}/>                    
                   </FormControl>)
                   }
                   
@@ -232,12 +231,12 @@ const GroupField = ({ fields, data , type}:props) => {
             />
             </div>
           </div>
-        ))}
+        ))}    
 			</form>
 		</Form>
 	</FormProvider>
-        
       </div>
+    </>
       }
       </>
     );
