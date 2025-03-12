@@ -1,12 +1,13 @@
 import { BaseApiService, CompanyId } from "@/app/api/baseApiApps4x"
 import { apps4xApiUrls } from "./apps4xApis";
 import Handlebars from "handlebars";
+import { pageService } from "./pageService";
 
 class Apps4xService extends BaseApiService {
   constructor() {
     super('api/v1/')
   }
-
+  currentAppMenuList:any[] = [];
   async getMetaobjectType(ObjectType:any[],AppId?:string,givePermission?:boolean,filterwithcompany?:boolean){
     let url = apps4xApiUrls.getMetaObjectByType(CompanyId);
     if (Array.isArray(ObjectType) && ObjectType.length > 0) {
@@ -171,6 +172,33 @@ class Apps4xService extends BaseApiService {
   }
   async getSingleMetaObjectByRecId(RecId:number) {
     let url = apps4xApiUrls.getSingleMetaObjectByRecId(CompanyId,RecId);
+    return await this.getApi(url);
+  }
+  async getAllMetaObjectByObjectType(ObjectType:string[],AppId?:string,givePermission?:boolean,filterwithcompany?:boolean){
+    let url = apps4xApiUrls.getMetaObjectByType(CompanyId);
+      if (Array.isArray(ObjectType) && ObjectType.length > 0) {
+        let parameter = "";
+        let i = 0;
+        let query="objectTypes";
+        ObjectType.forEach((id) => {
+          if (i == 0) parameter += `?${query}=${id}`;
+          else parameter += `&${query}=${id}`;
+          i++;
+        });
+        url = url+ parameter;
+      }
+    
+      if(AppId){
+          url = `${url}&appId=${AppId}`
+      }
+
+      if (givePermission) {
+          url = `${url}&givepermissiondata=true`
+      }
+
+      if(filterwithcompany){
+          url = `${url}&filterwithcompany=true`
+      }
     return await this.getApi(url);
   }
   async PostDyamicLogicData(EntityObjectsId:string, _FormData:any,_RowData:any) {
@@ -610,7 +638,8 @@ export const handleBarData = (_code: string, data: Record<string, any> = {}) => 
   // data.Parameter = (window as any).globalService?.SysParameter || {};
   // data.Global = (window as any).globalService || {};
 
-  // data.PageData = (window as any).pageService?.PageAllData || {};
+  if(pageService.PageAllData)
+    data.PageData = pageService.PageAllData;
 
   if (_code) {
     const template = Handlebars.compile(_code);

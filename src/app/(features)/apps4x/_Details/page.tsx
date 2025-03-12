@@ -1,55 +1,63 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-  } from "@/components/ui/dialog";
 import { useTheme } from "next-themes";
 import { apps4xService, checkConditionValidate, FilterDuplicateMetaobject, handleBarData } from "@/services/apps4xService";
 import { useApi } from "@/app/api/useApi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGroupedState } from "../customState";
 import GroupView from "../_components/Views";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import ActionForm from "../_ActionForm/page";
+import { useParams, useSearchParams } from "next/navigation";
+import { pageService } from "@/services/pageService";
 type Props = {
-    CloseDialog:() => void;
-    openDialog:boolean;
-    formData:any;
+    CollectionId?:string
     EntityId:string;
-    RecId:number
+    RecId:number,
+    Fields?:any[],
+    ViewFrom?:'Popup'| 'root' |'Page',
+    DetailsData?:any,
+    group?:any,
+    entityForm?:any,
+    HideAction?:boolean,
+    HideHeader?:boolean,
+    PageData?:any,
+    PageLoadData?:any,
+    PrimaryId?:any,
+    getWorkflowStageList?:(data:any) => void
 }
 
-export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,RecId}:Props) {
+export default function DetailsPage({CollectionId,EntityId,RecId,Fields,ViewFrom,DetailsData,group,entityForm,HideAction,HideHeader,PageData,PageLoadData,PrimaryId,getWorkflowStageList}:Props) {
+    const params = useParams();
+    const searchParams = useSearchParams();
     const {stateObject,setState}= useGroupedState();
-    const {theme}  = useTheme();
-    const formDataConfig = formData?  JSON.parse(formData.Config):null;
+    const [formData ,setformData] = useState<any>({});
+    const [formDataConfig ,setformDataConfig] = useState<any>(null);
 
     const GetDynamicSchema = async (init?:boolean) => {
-   
-      if (EntityId) {
-        await apps4xService.getDynamicSchema(null, EntityId).then((res: any) => {
+      let _EntityId = stateObject?.EntityId?stateObject.EntityId:EntityId
+      if (_EntityId) {
+        await apps4xService.getDynamicSchema(null, _EntityId).then((res: any) => {
           let _data: any = res;
-          if (EntityId) {
-            let Entities: any[] = _data.Type.filter((x:any) => x.EntityId == EntityId);
+          if (_EntityId) {
+            let Entities: any[] = _data.Type.filter((x:any) => x.EntityId == _EntityId);
+            let _EntityDetails:any = null;
             if (Entities.length > 1) {
   
               if (Entities.find((x) => x.Status == 'Active')) {
-                setState('EntityDetails', Entities.filter(x => x.Status == 'Active')[0]);
+                _EntityDetails = Entities.filter(x => x.Status == 'Active')[0];
               }
               else if (Entities.find((x) => x.Status == 'Draft')) {
-                setState('EntityDetails',  Entities.filter(x => x.Status == 'Draft')[0]);
+                _EntityDetails =  Entities.filter(x => x.Status == 'Draft')[0];
               }
               else {
-                setState('EntityDetails',  Entities[Entities.length - 1]);
+                _EntityDetails =    Entities[Entities.length - 1];
               }
   
             }
             else {
-              setState('EntityDetails',  Entities[0]);
+              _EntityDetails =   Entities[0];
             }
-  
+            setState('EntityDetails',_EntityDetails)
+            setState('HeaderTitle',_EntityDetails.Name?_EntityDetails.Name + ' Details':'Details - '+_EntityId)
           }
           // else if (this.CollectionId) {
           //   this.CollectionDetails = _data.Collection.filter((x: any) => x.CollectionId == this.CollectionId)[0];
@@ -66,24 +74,47 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
             _form.push(Data);
           })
   
+          
+  
+          if(_data && _data.Forms?.length>0){
+            let _detailsform: any[] = [];
+            _data.Forms.forEach((x:any) => {
+              let Data: any = JSON.parse(x.Data)
+              if (Data.Type == 'Details') {
+                Data.FormId = x.Id;
+                Data.RecId = x.RecId;
+                Data.Status = x.Status;
+                Data.Version = x.Version;
+                _detailsform.push(Data);
+              }
+            });
+            if (group && group.PageEntity && group.PageEntity.FormId) {
+            _detailsform = _detailsform.filter(x => x.FormId == group.PageEntity.FormId);
+          }
+            if(_detailsform.length>0){
+              let _formData:any = {};
+            if (_detailsform.find((x) => x.Status == 'Active')) {
+              _formData = _detailsform.filter(x => x.Status == 'Active')[0]
+              setformData(_formData);
+            }
+            else if (_detailsform.find((x) => x.Status == 'Draft')) {
+              _formData = _detailsform.filter(x => x.Status == 'Draft')[0]
+              setformData(_formData);
+            }
+            else {
+              _formData = _detailsform[_detailsform.length - 1]
+              setformData(_formData);
+            }
+            setformDataConfig(_formData? JSON.parse(_formData.Config):null);
+            setState('PageGroup',_formData? JSON.parse(_formData.ObjectData).PageGroup:[]);
+          }
+  
+          }
+
           setState('ActionForm', _form.filter(x => x.Type == "Action"));
           setState('ActivityForm', _form.filter(x => x.Type == "Activity"));
-  
-          let _detailsform: any[] = [];
-          _data.Forms.forEach((x:any) => {
-            let Data: any = JSON.parse(x.Data)
-            if (Data.Type == "Details") {
-              Data.FormId = x.Id;
-              Data.RecId = x.RecId;
-              Data.Status = x.Status;
-              Data.Version = x.Version;
-              _detailsform.push(Data);
-            }
-          });
                     
-          // if (this.group && this.group.PageEntity && this.group.PageEntity.FormId) {
-          //   _detailsform = _detailsform.filter(x => x.FormId == this.group.PageEntity.FormId);
-          // }
+          
           // loadAction Form in useEffect  
           // this.EntityFieldList = this.EntityFieldList.sort((a:any, b:any) => {
           //   if (a.OrderId < b.OrderId) return -1;
@@ -99,8 +130,8 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
           }
       }
       // else {
-      //   if (this.group && this.group.PageEntity && this.group.PageEntity.FormId) {
-      //     this.EntityObjectsId = this.group.PageEntity.FormId;
+      //   if (stateObject?.group && stateObject?.group.PageEntity && stateObject?.group.PageEntity.FormId) {
+      //     this.EntityObjectsId = stateObject?.group.PageEntity.FormId;
       //     this.getEntityFormbyId(null,init);
       //   }
       //   else if(this.ConnectorId && this.EntityObjectsId)
@@ -109,6 +140,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
     };
     
     const loadActionForm = () => {
+      if(formDataConfig && formData)
       if (stateObject?.ActionForm && stateObject?.ActionForm.length > 0 && stateObject?.DetailsData) {
         setState('gridActionList',[]);
         setState('ActivityList',[]);
@@ -207,10 +239,30 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
       }
     }
     
-    const {data ,loading ,error , execute:getDynamicDetails} = useApi<any>(() => apps4xService.getDynamicDetails(EntityId,RecId));
+    const {data ,loading ,error , execute:getDynamicDetails} = useApi<any>(() => apps4xService.getDynamicDetails(stateObject?.EntityId?stateObject.EntityId:EntityId,stateObject?.RecId?stateObject.RecId:RecId));
 
-    const setDynamicDetailsData = (_data:any) => {
+    const setDynamicDetailsData = (_data?:any) => {
+      if(stateObject?.DetailsData) {
+       setState('RecId',stateObject?.DetailsData.RecId);
+      // getcurrentStage();
+      // getProcessStageList();
       loadActionForm();
+  
+      if (group && group.ControlData)
+        group.ControlData.FormData = stateObject?.DetailsData;
+    
+        pageService.getAllPageData();
+  
+        getWorkflowStageList&&getWorkflowStageList({Data:stateObject?.DetailsData});
+      }
+  
+      if (group && group.PageEntity && group.PageEntity.LoadControllers) {
+        pageService.onControllerTrigger.next({ ControllerId: group.PageEntity.LoadControllers, Type: "Enable" });
+      }
+  
+      // if(this.DetailsFormMetaObject?.ParentType=="Connector" && this.DetailsForm?.ParentId) {
+      //   this.loadActionForm();
+      // }
     }
 
     const getDatabyDatasource = async () => {
@@ -272,7 +324,7 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
               });
     
           } else {
-            await apps4xService.getDynamicDetails(formData.OnSaveDSId, RecId).then((data) => {
+            await apps4xService.getDynamicDetails(formData.OnSaveDSId, stateObject?.RecId?stateObject.RecId:RecId).then((data) => {
               setState("DetailsData", data.Data ? data.Data : data);
               setDynamicDetailsData(data.Data ? data.Data : data);
             }).catch((error) => {
@@ -482,116 +534,458 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
       }
       
     }
-    const getDynamicDetailsData = () => {
-      if(formData && formData.OnSaveDSType){
-        getDatabyDatasource();
-      }else{
-        getDynamicDetails();
+    const getPageData = () => {
+
+      if (!entityForm) {
+        return
+      }
+  
+      entityForm.OnSaveDSType = entityForm?.OnSaveDSType;
+      entityForm.OnSaveDSId = entityForm?.OnSaveDSId;
+      entityForm.OnSaveDSData = entityForm?.OnSaveDSData;
+  
+      let _handleData:any = {};
+      
+      if (entityForm.OnSaveDSType == "Query") {
+  
+        if(entityForm.OnSaveDSId) {
+  
+      let Parameter: any[] = [];
+      let _handleData: any = {};
+  
+      if (entityForm) {
+  
+        let _QueryData = JSON.parse(entityForm.OnSaveDSData);
+        let _param = _QueryData.DSQueryParamsList;
+  
+        Parameter = _param.map((x:any) => {
+          x.Value = handleBarData(x.Value, {...arguments[0],...stateObject,..._handleData});
+          return x
+        });
+  
+      }
+  
+          apps4xService.getDyamicQueryData(entityForm.OnSaveDSId,null,Parameter)
+          .then((res: any) => {
+            
+            setState('PageData',res.Data?res.Data:res);
+            setState('DetailsData',res.Data?res.Data:res);
+          },
+            (error) => {
+              
+              
+              
+            });
+        }
+        
+      }
+      else if (entityForm.OnSaveDSType == "Entity") {
+        if (entityForm.OnSaveDSId) {
+  
+          let EntityData = {
+            Condition: {
+              Condition: [],
+              ConditionOperator:1
+            },
+            QueryStrings: [],
+            ResponseView: null,
+            ActionType: "GET"
+          }
+          EntityData = JSON.parse(stateObject?.selectedActionForm?.OnSaveDSData);
+          let _handleData: any = {};
+          let data: any = {};
+          EntityData.QueryStrings.forEach((x:any) => {
+            x.Value = handleBarData(x.Value, {..._handleData, ...arguments[0],...stateObject});
+            if (x.Value)
+              data[x.name] = x.Value;
+          });
+  
+          if (EntityData.ActionType == "GET") {
+  
+            apps4xService.getDynamicList(null, entityForm.OnSaveDSId).then(
+              (res: any) => {
+  
+                setState('PageData',res.Data?res.Data:res);
+                setState('DetailsData',res.Data?res.Data:res);
+              },
+              (error) => {
+  
+              }
+            );
+  
+          } else {
+            setState('showActionForm',false);
+            apps4xService.getDynamicDetails(data.EntityId, data.RecId, data.PrimaryId).then(
+              (res) => {
+                setState('PageData',res.Data?res.Data:res);
+                setState('DetailsData',res.Data?res.Data:res);
+              }, (error) => {
+  
+              });
+          }
+        }
+        
+      }
+      else if(entityForm.OnSaveDSType == "SQLConnector") {
+  
+        if(entityForm.OnSaveDSId){
+  
+          let _objectType = JSON.parse(entityForm.OnSaveDSData);
+  
+          let condition = null;
+          if (_objectType.Condition && _objectType.Condition.length > 0) {
+            let _condition:any = {
+              Condition:_objectType.Condition,
+              ConditionOperator:_objectType.ConditionOperator
+            }
+            condition = JSON.stringify(_condition)
+            condition = handleBarData(condition);
+          }
+  
+          apps4xService.getSqlDetails(entityForm.OnSaveDSId,_objectType.Type,_objectType.Name)
+          .then((res: any) => {
+            let _data: any = res.Data ? res.Data : res;
+  
+            setState('PageData',_data);
+            setState('DetailsData',_data);  
+          },
+            (error) => {
+             
+            });
+  
+        }
+  
+      }
+      else {
+  
+        if (entityForm.OnSaveDSData) {
+          let RestData = JSON.parse(entityForm.OnSaveDSData)
+            if(RestData.Path && RestData.Path.length>0){
+              RestData.Path.forEach((x:any) => {
+               let path = {
+                [x.name]:handleBarData(x.Value,{..._handleData,...arguments[0],...stateObject})
+               }
+    
+            _handleData = {..._handleData,...path}
+              })
+              RestData.ApiUrl = handleBarData(RestData.ApiUrl, {..._handleData,...arguments[0],...stateObject});
+              if(RestData.ApiUrl){
+                RestData.ApiUrl = CheckSingleQuoteReplace(RestData.ApiUrl)
+              }
+            }
+  
+          RestData.ApiUrl = handleBarData(RestData.ApiUrl,{..._handleData,...arguments[0],...stateObject});
+          if (RestData.Body && RestData.BodyType == 'json' && typeof RestData.Body == "string") {
+            RestData.Body = handleBarData(RestData.Body, {..._handleData,...arguments[0],...stateObject});
+            RestData.Body = JSON.parse(RestData.Body);
+          }
+          else if (RestData.Body && RestData.BodyType == 'stringfyjson' && typeof RestData.Body == "string") {
+            RestData.Body = JSON.parse(RestData.Body);
+            Object.keys(RestData.Body).forEach(x => {
+  
+              RestData.Body[x] = handleBarData(RestData.Body[x], {..._handleData,...arguments[0],...stateObject});
+            });
+          }
+          else
+            RestData.Body = handleBarData(RestData.Body, {..._handleData,...arguments[0],...stateObject});
+        if(RestData.QueryStrings){
+          RestData.QueryStrings = RestData.QueryStrings.map((x:any) => {
+            x.Value = handleBarData(x.Value,{..._handleData,...arguments[0],...stateObject});
+            return x
+          });
+        }
+          if(RestData?.Headers){
+          RestData.Headers = RestData.Headers.map((x:any) => {
+            x.Value = handleBarData(x.Value,{..._handleData,...arguments[0],...stateObject});
+            return x
+          });
+        }
+         
+          apps4xService.dynamicAPi(RestData)
+            .then((res: any) => {
+              setState('PageData',[]);
+              
+              let _data: any = res;
+              if (RestData.ResponseView) {
+                let _rview = RestData.ResponseView.split(".");
+                _rview.forEach((x:any) => {
+                  _data = _data[x];
+                });
+              }
+              setState('PageData',_data);
+              setState('DetailsData',_data);
+  
+            },
+              (error) => {
+                
+              });
+        }
+       
+      }
+  
+    }
+    const getDynamicDetailsData = (init?: boolean,start?:boolean) => {
+      if (stateObject?.group && stateObject?.group.PageEntity) {
+        return
+      }
+  
+      let _isFullLoad = false;
+  
+      if (stateObject?.group && stateObject?.group.PageEntity.IsDependentController) {
+        if (!stateObject?.group.PageEntity.SelectedGroupId  && !init) {
+          _isFullLoad = true;
+        }
+      }
+      if (stateObject?.group && stateObject?.group.PageEntity.IsDependentController && !init) {
+        pageService.onPageLoad.next({ isLoad: true, GroupIds: stateObject?.group.PageEntity.SelectedGroupId });
+      }
+  
+      
+      if(stateObject?.group && stateObject?.group.PageEntity.PreventInitLoad && start ){
+        return
+      }
+  
+  
+      
+      if (stateObject?.group && stateObject?.group.ID) {
+        pageService.getAllPageData();
+        if (pageService.PageAllData.find(x => x.ID == stateObject?.group.ID)) {
+          setState('PageGroupParams', pageService.PageAllData.filter(x => x.ID == stateObject?.group.ID)[0].ParamsData);
+        }
+  
+      }
+      if (!_isFullLoad) {
+        if (stateObject?.dataLoadType == "Page") {
+          pageService.onPageLoad.next({ isLoad: true });
+          getPageData();
+        } else if (formData && formData.OnSaveDSType) {
+          getDatabyDatasource();
+        } else {
+          getDynamicDetails();
+        }
       }
     }
 
     useEffect(() => {
-      getDynamicDetailsData();
-      setState('PageGroup',formData? JSON.parse(formData.ObjectData).PageGroup:[]);
-    },[]);
+      if(CollectionId){
+        setState('CollectionId',CollectionId);
+      }
+      if(EntityId){
+        setState('EntityId',EntityId);
+      }
+      if(RecId){
+        setState('RecId',RecId);
+      }
+      if(PrimaryId){
+        setState('PrimaryId',PrimaryId);
+      }
+      if(DetailsData){
+        setState('DetailsData',DetailsData);
+      }
+      if(group){
+        setState('group',group);
+      }
+      if(PageData){
+        setState('PageData',PageData);
+      }
+      if(PageLoadData){
+        setState('PageLoadData',PageLoadData);
+      }
+      setState('HideHeader',HideHeader);
+      setState('HideAction',HideAction);
+
+      if (!HideHeader) {
+        if (group && group.PageEntity.HideHeader)
+         setState('HideHeader', group.PageEntity.HideHeader)
+      }
+  
+      if (!HideAction) {
+        if (group && group.PageEntity.HideAction)
+         setState('HideAction' ,group.PageEntity.HideAction);
+      }
+
+    },[EntityId,RecId,DetailsData,group,HideAction,HideHeader,PageData,PageLoadData,PrimaryId,CollectionId]);
+
+    useEffect(() => {
+      if(ViewFrom === 'root' || !ViewFrom){
+        if(params.EntityId){
+          setState('EntityId',params.EntityId);
+        }
+        if(params.RecId){
+          setState('RecId',Number(params.RecId));
+        }
+        if(params.CollectionId){
+          setState('CollectionId',params.CollectionId);
+        }
+        if(params.PrimaryId){
+          setState('PrimaryId',params.PrimaryId);
+        }
+        if(params.Version){
+          setState('Version',params.Version);
+        }
+      }
+      setState('loads',true)
+    },[params]);
+
+    useEffect(() => {
+      const paramsObj: Record<string, string | null> = {};
+      searchParams.forEach((value, key) => {
+        paramsObj[key] = value;
+      });
+      setState('queryParams',searchParams);
+  
+      if (paramsObj.recid) {
+        setState('RecId',Number(paramsObj.recid));
+      }
+    },[searchParams])
+
+    useEffect(() => {
+      if(stateObject && stateObject.loads === true){
+        GetDynamicSchema(true);
+
+        if (stateObject?.DetailsData && ViewFrom === "Page" && !(stateObject?.group?.PageEntity?.FormId)) {
+          setState('dataLoadType', "Page");
+          setDynamicDetailsData()
+        }
+        else if (!stateObject?.group?.PageEntity?.FormId)
+          getDynamicDetailsData(true);
+      }
+    },[stateObject?.loads]);
 
     useEffect(() => {
       if(data){
         setState('DetailsData',data);
-        setDynamicDetailsData(data);
       }
-      GetDynamicSchema(true);
     },[data]);
 
     useEffect(() => {
       loadActionForm();
     },[stateObject?.ActionForm]);
+
+    useEffect(() => {
+      setDynamicDetailsData()
+    },[stateObject?.DetailsData]);
+
+    useEffect(() => {
+        const pageLoadSub = pageService.onPageLoad.subscribe((x) => {
+          if(x.isLoad && x.GroupIds){
+            if (group && x.GroupIds.includes(group.ID)) {
+          setTimeout(() => {
+            if(!group?.PageEntity?.FormId)
+          getDynamicDetailsData(true);
+          }, 1);
+          }
+        }
+        });
+    
+    
+        const controllerSub = pageService.onControllerTrigger.subscribe((x) => {
+          if (group && group.ID == x.ControllerId) {
+            if(x.Type=="Load"){
+                getDynamicDetailsData(true);
+            }
+          }
+        });
+    
+        return () => {
+          pageLoadSub.unsubscribe();
+          controllerSub.unsubscribe();
+        };
+      }, [])
+
     return (
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <Dialog open={openDialog} onOpenChange={CloseDialog}>
-          <DialogContent
-            onInteractOutside={(e) => e.preventDefault()}
-            className={`max-w-full p-8 max-h-full overflow-y-auto rounded-lg shadow-lg ${
-              theme === "dark" ? "bg-gray-900" : "bg-white"
-            }`}
-          >
-            <DialogHeader>
-              <DialogTitle>
-                <div className="flex items-center">Details</div>
-              </DialogTitle>
+        
+            <>
+              <div className="details_header">
+                <h5 className="m-0 font-bold">{stateObject?.HeaderTitle}</h5>
+              </div>
+              <div className="groupView shadow-md shadow-muted rounded-lg">
+                <div className="actions-header">
+                  <div className="actions">
+                    <div className="actionlist">
+                      {stateObject?.gridActionList &&
+                        stateObject.gridActionList.map(
+                          (item: any, index: number) => (
+                            <a
+                              key={item.Name + index}
+                              onClick={(e) => (
+                                openActionClickEvent(item), e.preventDefault()
+                              )}
+                              className="actions-item shadow-md shadow-muted"
+                            >
+                              {item.IconName && (
+                                <i className={`${item.IconName} mx-1`}></i>
+                              )}
+                              {item.Name}
+                            </a>
+                          )
+                        )}
 
-              <DialogDescription>{/*  */}</DialogDescription>
-            </DialogHeader>
-            <div className="groupView">
-              <div className="actions-header">
-                <div className="actions">
-                  <div className="actionlist">
-                    {stateObject?.gridActionList &&
-                      stateObject.gridActionList.map(
-                        (item: any, index: number) => (
+                      {stateObject?.EntityDetails &&
+                        stateObject?.EntityDetails?.Attachments != null && (
                           <a
-                            key={item.Name + index}
+                            className="actions-item inline-flex shadow-md shadow-muted"
                             onClick={(e) => (
-                              openActionClickEvent(item), e.preventDefault()
+                              attachMethod(), e.preventDefault()
                             )}
-                            className="actions-item"
                           >
-                            {item.IconName && (
-                              <i className={`${item.IconName} mx-1`}></i>
-                            )}
-                            {item.Name}
+                            <i className="fas fa-paperclip mx-1 my-1 pointer"></i>
+                            Attach
                           </a>
-                        )
-                      )}
-
-                    {stateObject?.EntityDetails &&
-                      stateObject?.EntityDetails?.Attachments != null && (
-                        <a
-                          className="actions-item inline-flex"
-                          onClick={(e) => (attachMethod(), e.preventDefault())}
-                        >
-                          <i className="fas fa-paperclip mx-1 my-1 pointer"></i>
-                          Attach
-                        </a>
+                        )}
+                    </div>
+                    {stateObject?.ActivityList &&
+                      stateObject.ActivityList.length > 0 && (
+                        <div className="activitylist">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>Action</DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              {stateObject?.ActivityList.map(
+                                (item: any, index: number) => (
+                                  <DropdownMenuItem
+                                    key={item.Name + index}
+                                    onClick={(e) => (
+                                      openActionClickEvent(item),
+                                      e.preventDefault()
+                                    )}
+                                  >
+                                    {item.Name}
+                                  </DropdownMenuItem>
+                                )
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       )}
                   </div>
-                  {stateObject?.ActivityList &&
-                    stateObject.ActivityList.length > 0 && (
-                      <div className="activitylist">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>Action</DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            {stateObject?.ActivityList.map(
-                              (item: any, index: number) => (
-                                <DropdownMenuItem
-                                  key={item.Name + index}
-                                  onClick={(e) => (
-                                    openActionClickEvent(item),
-                                    e.preventDefault()
-                                  )}
-                                >
-                                  {item.Name}
-                                </DropdownMenuItem>
-                              )
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    )}
+                  <div className="refresh">
+                    <a
+                      onClick={(e) => (
+                        e.preventDefault(), getDynamicDetailsData()
+                      )}
+                    >
+                      <i className="fas fa-sync mx-2 pointer"></i>
+                    </a>
+                  </div>
+                </div>
+                <div className="groupView-content">
+                  <GroupView
+                    key={
+                      formData?.FormId ?? stateObject?.RecId
+                        ? stateObject.RecId
+                        : RecId
+                    }
+                    PageGroup={stateObject?.PageGroup ?? []}
+                    data={stateObject?.DetailsData}
+                    formData={formData}
+                    type="Details"
+                    Fields={Fields}
+                    submitFormValue={() => console.log("submitFormValue")}
+                  ></GroupView>
                 </div>
               </div>
-              <div className="groupView-content">
-                <GroupView key={formData.FormId}
-                  PageGroup={stateObject?.PageGroup}
-                  data={stateObject?.DetailsData}
-                  formData={formData}
-                  type="Details"
-                  submitFormValue={()=>console.log("submitFormValue")}
-                ></GroupView>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </>
         {stateObject?.selectedActionForm &&
           stateObject?.selectedActionForm.FormId &&
           stateObject?.selectedActionFormConfig.DirectAction !== true && (
@@ -601,8 +995,8 @@ export default function DetailsPage({CloseDialog,openDialog,formData,EntityId,Re
               ActionForm={stateObject?.selectedActionForm}
               ActionFormConfig={stateObject?.selectedActionFormConfig}
               Data={stateObject?.DetailsData}
-              Fields = {stateObject?.EntityDetails?.Fields}
-              EntityId={EntityId}
+              Fields={stateObject?.EntityDetails?.Fields}
+              EntityId={stateObject?.EntityId ? stateObject.EntityId : EntityId}
             ></ActionForm>
           )}
       </div>

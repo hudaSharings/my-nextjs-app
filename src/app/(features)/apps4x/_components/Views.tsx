@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { AlertDialog ,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogCancel,AlertDialogAction, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { useForm, UseFormReturn } from "react-hook-form";
+import { pageService } from "@/services/pageService";
 type props = {
   PageGroup: any[];
   data: any;
@@ -376,19 +377,19 @@ function GroupView({ PageGroup, data, formData ,type ,Fields , submitFormValue}:
           _ParamsData[x.Params] = _val
         });
       }
-      // controllerIds.forEach(controllerId => {
+      controllerIds.forEach(controllerId => {
         
-      //   if (_ParamsData) {
-      //     this.pageService.PageAllData = this.pageService.PageAllData.map(x => {
-      //       if (x.ID == controllerId) {
-      //         x.ParamsData = _ParamsData
-      //       }
-      //       return x
-      //     });
-      //   }  
-      //   let _ControllerType = rulesEvent.ControllerType?rulesEvent.ControllerType:"Load";
-      //   this.pageService.onControllerTrigger.next({ControllerId:controllerId,Type:_ControllerType});      
-      // });
+        if (_ParamsData) {
+          pageService.PageAllData = pageService.PageAllData.map(x => {
+            if (x.ID == controllerId) {
+              x.ParamsData = _ParamsData
+            }
+            return x
+          });
+        }  
+        let _ControllerType = rulesEvent.ControllerType?rulesEvent.ControllerType:"Load";
+        pageService.onControllerTrigger.next({ControllerId:controllerId,Type:_ControllerType});      
+      });
     }
     else if (rulesEvent.ActionType == 'Datasource') {
       getDatasoureData(rulesEvent.DataSourceRecId,null,null,'Event',rulesEvent.RestSuccessMsg,rulesEvent.RestFailureMsg);
@@ -851,21 +852,25 @@ function GroupView({ PageGroup, data, formData ,type ,Fields , submitFormValue}:
         setState("Data", data);
       }
     setState("PageGroup", PageGroup);
-    onFormInit(formData, null, data);
+    if(formData && (!stateObject?.InitRulesLoaded || !stateObject)){
+      onFormInit(formData, null, data);
+      setState('InitRulesLoaded',true);
+    }
     }
   }, [data]);
 
   useEffect(() => {
+    if(formData)
     _submitFormValue();
   },[form])
   return (
     <>
-      {stateObject?.PageGroup &&
+      {stateObject?.PageGroup && stateObject.PageGroup.length>0 &&
         stateObject?.PageGroup.map((row: any, Index: number) => (
-          <div className="flex" key={"group" + row.ID+ " "+formData.FormId}>
+          <div className="flex" key={"group" + row.ID}>
             {row.Groups.map((group: any, groupIndex: number) => (
               <div
-                key={"inner" +row.ID + "" + groupIndex + " "+formData.FormId}
+                key={"inner" +row.ID + "" + groupIndex}
                 className={`detail-group col clearfix ${
                   group.Class
                 } w-${getFractionalWidth(group.Width)} ${group.Direction} ${
@@ -879,7 +884,7 @@ function GroupView({ PageGroup, data, formData ,type ,Fields , submitFormValue}:
                 }}
               >
                 {
-                  <GroupField key={formData.FormId+" "+row.ID + "" + groupIndex}
+                  <GroupField key={row.ID + "" + groupIndex}
                     fields={group.Fields}
                     data={type==='Details'?stateObject?.DetailsData:stateObject?.Data}
                     type={type}

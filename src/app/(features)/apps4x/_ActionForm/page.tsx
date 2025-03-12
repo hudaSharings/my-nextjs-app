@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { apps4xService, checkConditionValidate, DateTimeFormater, downloadFile, handleBarData } from "@/services/apps4xService";
 import { CheckSingleQuoteReplace } from "../_Details/page";
 import { AlertDialog ,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogCancel,AlertDialogAction, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { pageService } from "@/services/pageService";
 
 type Props = {
     showActionForm:boolean,
@@ -646,15 +647,15 @@ export default function ActionForm({Data,showActionForm,CloseActionForm,ActionFo
           controllerIds.forEach(controllerId => {
   
             if (_ParamsData) {
-              // this.pageService.PageAllData = this.pageService.PageAllData.map(x => {
-              //   if (x.ID == controllerId) {
-              //     x.ParamsData = _ParamsData
-              //   }
-              //   return x
-              // });
+              pageService.PageAllData = pageService.PageAllData.map(x => {
+                if (x.ID == controllerId) {
+                  x.ParamsData = _ParamsData
+                }
+                return x
+              });
             }
             let _ControllerType = rulesEvent.ControllerType?rulesEvent.ControllerType:"Load";
-            // this.pageService.onControllerTrigger.next({ ControllerId: controllerId, Type: _ControllerType });
+            pageService.onControllerTrigger.next({ ControllerId: controllerId, Type: _ControllerType });
           });
         }
         else if (rulesEvent.ActionType == 'RestApi') {

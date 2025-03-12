@@ -23,13 +23,14 @@ export function NavSetups({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
+    Title: string
+    URL: string
+    Icon?: string | LucideIcon
     isActive?: boolean
+    StaticIcon ?: boolean
     items?: {
-      title: string
-      url: string
+      Title: string
+      URL: string
     }[]
   }[]
 }) {
@@ -39,32 +40,45 @@ export function NavSetups({
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
-            key={item.title}
+            key={item.Title}
             asChild
             defaultOpen={item.isActive}
             className="group/collapsible"
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                <SidebarMenuButton tooltip={item.Title}>
+                  {item.URL && item.URL !== '#' ? 
+                  <Link href={item.URL}>
+                  {(item.StaticIcon  && item.Icon ? <item.Icon /> : <i className={'mx-2 ' + (item.Icon?item.Icon:item?.items?.length == 0?'tabler-ti ti-point-filled':'')}></i>)}                
+                   <span>{item.Title}</span>
+                   </Link>
+                   : <>
+                   {(item.StaticIcon && item.Icon ? <item.Icon /> : <i className={'mx-2 ' + (item.Icon?item.Icon:item?.items?.length == 0?'tabler-ti ti-point-filled':'')}></i>)}                  
+                   <span>{item.Title}</span>
+                   </>
+                   }
+                  {item.items && item.items.length > 0 && (
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  )}
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent>
+              {item.items && item.items.length > 0 && (
+                <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubItem key={subItem.Title}>
                       <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url}>
-                          <span>{subItem.title}</span>
+                        <Link href={subItem.URL}>
+                          <span>{subItem.Title}</span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
                 </SidebarMenuSub>
               </CollapsibleContent>
+              )}
+              
             </SidebarMenuItem>
           </Collapsible>
         ))}

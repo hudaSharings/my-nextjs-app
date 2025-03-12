@@ -1,4 +1,5 @@
 @import '../components/css/fontawesome-free/css/all.min.css';
+@import url("https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css");
 
 @tailwind base;
 @tailwind components;
@@ -7,7 +8,16 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
-
+.tabler-ti {
+  font-family: tabler-icons !important;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 @layer base {
   :root {
@@ -184,10 +194,7 @@ body {
   padding-right: 20px !important;
 }
 .groupView {
-  background: #fff;
   padding: 1.25rem;
-  border-radius: 5px;
-  box-shadow: 0 0 #000 0, 0 0 #000 0, 0 0 #000 0, 0 0 #000 0, 0px 1px 2px rgba(0, 0, 0, .1);
 }
 .groupView .actions-header {
   display: flex;
@@ -208,12 +215,12 @@ body {
 }
 .groupView .actions .actionlist a {
   border-right: 1px solid #ddd;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.09) inset;
+  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.09) inset;
   box-shadow: #000 -5px -5px 10px 0px inset;
-  box-shadow: rgba(0, 0, 0, 0.13) -2px -3px 10px 0px inset;
+  box-shadow: rgba(0, 0, 0, 0.13) -2px -3px 10px 0px inset; */
   padding: 0.5rem 1rem;
   font-weight: 400;
-  color: #212529;
+  /* color: #212529; */
 }
 .groupView .actions .activitylist button.btn {
   padding: 0.5rem 1rem;
